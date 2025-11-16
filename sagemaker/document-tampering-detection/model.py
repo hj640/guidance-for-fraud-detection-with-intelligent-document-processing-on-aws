@@ -5,21 +5,17 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 import argparse
 import json
-import subprocess
-from tensorflow.keras.utils import to_categorical
 
+# Modeling
+from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPool2D
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers import RMSprop
 import boto3
-from PIL import Image
 from numpy import array
-
-from PIL import Image
 from PIL import Image, ImageChops, ImageEnhance
 
 np.random.seed(2)
-
 
 def convert_to_ela_image(path, quality):
     filename = path
@@ -50,16 +46,14 @@ def convert_to_ela_image(path, quality):
     del scale
     return ela_im
 
-def build_image_list(path_to_image, label, images):
-    for file in os.listdir(path_to_image):
-        try:
-            if file.endswith('jpg') or file.endswith('JPG') or file.endswith('jpeg') or file.endswith('JPEG'):
-                if int(os.stat(path_to_image + file).st_size) > 10000:
-                    line = path_to_image + file  + ',' + label + '\n'
-                    images.append(line)
-        except:
-            print(path_to_image + file)
-    return images
+def prepare_dataset(image_path, label):
+    image_data = {'image_path': [], 'label': []}
+    for img in os.listdir(image_path):
+        if img.endswith(('jpg', 'png', 'jpeg', 'JPEG', 'tif', 'tiff', 'TIF', 'TIFF')):
+            temp_path = image_path+"/"+str(img)
+            image_data['image_path'].append(temp_path)
+            image_data['label'].append(label)
+    return image_data
 
 
 def _parse_args():
@@ -82,68 +76,53 @@ if __name__ == "__main__":
     s3 = boto3.client("s3")
 
     print("ARGS", args)
-    #print(subprocess.run([f"aws s3 cp --recursive {args.train} ./"],
-    #               shell=True))
+
+    custom_path_original = f'{args.train}/Au/'
+    custom_path_tampered = f'{args.train}/Tp/'
     
-    custom_path_original = f'{args.train}/training/original/'
-    custom_path_tampered = f'{args.train}/training/forged/'
-    training_data_set = 'dataset.csv'
-    
-    images = []
-    images = build_image_list(custom_path_original, '0', images)
-    images = build_image_list(custom_path_tampered, '1', images)
-    
-    image_name = []
-    label = []
-    for i in range(len(images)):
-        image_name.append(images[i][0:-3])
-        label.append(images[i][-2])
-    
-    dataset = pd.DataFrame({'image':image_name,'class_label':label})
-    dataset.to_csv(training_data_set,index=False)
-    
-    dataset = pd.read_csv('dataset.csv')
+    tampered_image_data=pd.DataFrame(prepare_dataset(custom_path_tampered, 1))
+    original_image_data=pd.DataFrame(prepare_dataset(custom_path_original, 0))
+    dataset=pd.concat([tampered_image_data, original_image_data], axis=0)
+
     X = []
     Y = []
     for index, row in dataset.iterrows():
-        X.append(array(convert_to_ela_image(row[0], 90).resize((128, 128))).flatten() / 255.0)
+        X.append(array(convert_to_ela_image(row[0], 90).resize((128, 128))) / 255.0)
         Y.append(row[1])
     X = np.array(X)
     Y = to_categorical(Y, 2)
     
-    
-    X = X.reshape(-1, 128, 128, 3)
-    
     X_train, X_val, Y_train, Y_val = train_test_split(X, Y, test_size = 0.2, random_state=5)
     
-    
+    # VGG-16 CNN Model 
     model = tf.keras.models.Sequential()
     
-    model.add(Conv2D(filters = 32, kernel_size = (3,3),padding = 'valid', 
-                     activation ='relu', input_shape = (128,128,3)))
-    model.add(Conv2D(filters = 32, kernel_size = (3,3),padding = 'valid', 
-                     activation ='relu'))
-    model.add(MaxPool2D(pool_size=(2,2)))
+    # Block 1
+    model.add(Conv2D(32, (3,3), padding='same', activation='relu', input_shape=(128,128,3)))
+    model.add(Conv2D(32, (3,3), padding='same', activation='relu'))
+    model.add(MaxPool2D(2,2))
     model.add(Dropout(0.25))
+    
+    # Block 2
+    model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
+    model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
+    model.add(MaxPool2D(2,2))
+    model.add(Dropout(0.3))
+    
+    # Classifier - keep it moderate
     model.add(Flatten())
-    model.add(Dense(256, activation = "relu"))
+    model.add(Dense(128, activation='relu'))  
     model.add(Dropout(0.5))
-    model.add(Dense(2, activation = "softmax"))
+    model.add(Dense(2, activation='softmax'))
     
-    
-    optimizer = RMSprop(learning_rate=0.0005, rho=0.9, epsilon=1e-08, decay=0.0)
-    model.compile(optimizer = optimizer , loss = "categorical_crossentropy", metrics=["accuracy"])
+    optimizer = RMSprop(learning_rate=0.0005)
+    model.compile(optimizer=optimizer, loss="categorical_crossentropy", metrics=["accuracy"])
     
     epochs = 30
-    batch_size = 100
+    batch_size = 32  
     
-    early_stopping = EarlyStopping(monitor='val_accuracy',
-                                  min_delta=0,
-                                  patience=2,
-                                  verbose=0, mode='auto')
-    
-    history = model.fit(X_train, Y_train, batch_size = batch_size, epochs = epochs, 
-              validation_data = (X_val, Y_val), verbose = 2)#, callbacks=[early_stopping])
+    history = model.fit(X_train, Y_train, batch_size=batch_size, epochs=epochs, 
+              validation_data=(X_val, Y_val), verbose=2)
     
     
     model.save(os.path.join(args.sm_model_dir, '000000001'))

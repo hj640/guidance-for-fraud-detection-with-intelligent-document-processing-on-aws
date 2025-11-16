@@ -13,7 +13,12 @@ os.environ['AWS_DEFAULT_REGION'] = REGION
 boto3_session = boto3.Session()
 sagemaker_session = sagemaker.Session(boto_session=boto3_session)
 sagemaker_default_bucket =  sagemaker_session.default_bucket()
-sagemaker_role = get_execution_role()
+# Get sagemaker role
+try: 
+    sagemaker_role = get_execution_role()
+except ValueError:
+    iam = boto3.client('iam')
+    sagemaker_role = iam.get_role(RoleName='SageMakerExecutionRole')['Role']['Arn']
 print(sagemaker_role)
 
 # Get the AWS account ID
@@ -21,7 +26,7 @@ account_id = boto3.client("sts").get_caller_identity()["Account"]
 #bucket_name = f'{account_id}-{REGION}-tampered-image-detection-training'
 
 #copy images folder to S3
-subprocess.run(["aws", "s3", "cp", "--recursive", "./images", f"s3://{sagemaker_default_bucket}/tampered-image-train/"], shell=False)
+subprocess.run(["aws", "s3", "cp", "--recursive", "./CASIA2", f"s3://{sagemaker_default_bucket}/tampered-image-train/"], shell=False)
 
 estimator = TensorFlow(
     sagemaker_session = sagemaker_session,
