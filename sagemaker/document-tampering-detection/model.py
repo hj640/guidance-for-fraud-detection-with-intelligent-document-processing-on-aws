@@ -5,6 +5,7 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 import argparse
 import json
+import random
 
 # Modeling
 from tensorflow.keras.utils import to_categorical
@@ -16,6 +17,8 @@ from numpy import array
 from PIL import Image, ImageChops, ImageEnhance
 
 np.random.seed(2)
+tf.random.set_seed(2)
+random.seed(2)
 
 def convert_to_ela_image(path, quality):
     filename = path
