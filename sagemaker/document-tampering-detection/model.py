@@ -52,7 +52,7 @@ def convert_to_ela_image(path, quality):
 def prepare_dataset(image_path, label):
     image_data = {'image_path': [], 'label': []}
     for img in os.listdir(image_path):
-        if img.endswith(('jpg', 'png', 'jpeg', 'JPEG', 'tif', 'tiff', 'TIF', 'TIFF')):
+        if img.endswith(('jpg', 'png', 'jpeg', 'JPEG', 'tif', 'tiff', 'TIF', 'TIFF', 'bmp')):
             temp_path = image_path+"/"+str(img)
             image_data['image_path'].append(temp_path)
             image_data['label'].append(label)
