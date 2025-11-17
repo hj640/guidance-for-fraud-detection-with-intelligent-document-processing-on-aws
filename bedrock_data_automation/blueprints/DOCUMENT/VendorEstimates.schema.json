@@ -1,69 +1,60 @@
 {
-    "class": "Vendor Estimate",
-    "description": "A vendor estimate document that outlines the scope of work and associated costs for various repair and construction services",
-    "definitions": {
-        "VENDOR_CONTACT_INFO": {
-            "properties": {
-                "phone": {
-                    "type": "string",
-                    "instruction": "The phone number for the vendor"
-                },
-                "email": {
-                    "type": "string",
-                    "instruction": "The email address for the vendor"
-                },
-                "address": {
-                    "type": "string",
-                    "instruction": "The physical address for the vendor"
-                }
-            }
+  "class": "Vendor Estimates",
+  "description": "This is a blueprint for vendor estimate form.",
+  "type": "object",
+  "definitions": {
+    "VendorEstimate": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "The vendor's name."
         },
-        "SCOPE_OF_WORK": {
-            "properties": {
-                "item": {
-                    "type": "string",
-                    "instruction": "The description of the work to be performed"
-                },
-                "cost": {
-                    "type": "number",
-                    "instruction": "The estimated cost for the specific work item"
-                },
-                "checkbox": {
-                    "type": "boolean",
-                    "instruction": "Indicates if the work item has been selected for completion"
-                }
-            }
+        "phone": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "The vendor's phone number."
+        },
+        "email": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "The vendor's email."
+        },
+        "address": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "The vendor's address."
+        },
+        "estimateNumber": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "The unique identifier or reference number for estimate. "
+        },
+        "estimateDate": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "The date of this estimate was made. "
+        },
+        "scopeOfWork": {
+          "type": "array",
+          "inferenceType": "explicit",
+          "instruction": "Extract matched work item and price in array. The foramt should be \"work item - price\". For example, [\"Replace to Torn Shingles - 800\", \"Repair Structural Beams - 5000\"]. ",
+          "items": {
+            "type": "string"
+          }
         }
-    },
-    "properties": {
-        "vendor_name": {
-            "type": "string",
-            "inferenceType": "explicit",
-            "instruction": "The name of the vendor providing the estimate"
-        },
-        "vendor_contact_information": {
-            "$ref": "#/definitions/VENDOR_CONTACT_INFO"
-        },
-        "estimate_number": {
-            "type": "string",
-            "inferenceType": "explicit",
-            "instruction": "The unique identifier for the vendor estimate"
-        },
-        "estimate_date": {
-            "type": "string",
-            "inferenceType": "explicit",
-            "instruction": "The date the vendor estimate was issued"
-        },
-        "scope_of_work": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/SCOPE_OF_WORK"
-            }
-        },
-        "total_cost": {
-            "type": "number",
-            "inferenceType": "explicit",
-            "instruction": "The total cost for all the work outlined in the estimate"
-        }
+      }
     }
+  },
+  "properties": {
+    "FirstVendorEstimate": {
+      "$ref": "#/definitions/VendorEstimate",
+      "instruction": "The estimate information from the first vendor. "
+    },
+    "SecondVendorEstimate": {
+      "$ref": "#/definitions/VendorEstimate",
+      "instruction": "The estimate information from the second vendor. "
+    }
+  }
 }
