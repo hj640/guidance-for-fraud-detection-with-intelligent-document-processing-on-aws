@@ -8,12 +8,7 @@ from aws_cdk import (
 from constructs import Construct
 
 from insurance_claim_process_cdk.api import ApiStack
-from insurance_claim_process_cdk.dynamodb import DynamoDBStack
 from insurance_claim_process_cdk.frontend import FrontEndStack
-from insurance_claim_process_cdk.lambdafn import LambdaStack
-from insurance_claim_process_cdk.s3 import S3Stack
-from insurance_claim_process_cdk.sns import NotificationStack
-from insurance_claim_process_cdk.statemachines import BaseSfnStateMachineStack
 from insurance_claim_process_cdk.workflow import WorkflowStack
 
 config = configparser.ConfigParser()
@@ -23,14 +18,17 @@ class InsuranceClaimProcessStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
-        self.template_options.description = "Guidance for Fraud Detection with Intelligent Document Processing on AWS(SO9033)"
+        self.template_options.description = "Guidance for Fraud Detection with Intelligent Document Processing on AWS - Workflow"
+        workflow = WorkflowStack(self, "InsuranceClaimProcessWorkflow")
 
-        workflow = Stack(self, "InsuranceClaimProcessWorkflow")
-        stepfunctions = BaseSfnStateMachineStack(workflow, "InsuranceClaimProcessStepFunctions", config["BDA"]["projectArn"])
-        s3 = S3Stack(workflow, "InsuranceClaimProcessS3")
-        dynamodb = DynamoDBStack(workflow, "InsuranceClaimProcessDynamoDB")
-        lambda_ = LambdaStack(workflow, "InsuranceClaimProcessLambda")
-        sns = NotificationStack(workflow, "InsuranceClaimProcessSNS")
-
-        frontend = FrontEndStack(self, "InsuranceClaimProcessFrontEnd")
+class InsuranceClaimProcessApiStack(Stack):
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+        super().__init__(scope, construct_id, **kwargs)
+        self.template_options.description = "Guidance for Fraud Detection with Intelligent Document Processing on AWS - API"
         api = ApiStack(self, "InsuranceClaimProcessApi")
+
+class InsuranceClaimProcessFrontEndStack(Stack):
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+        super().__init__(scope, construct_id, **kwargs)
+        self.template_options.description = "Guidance for Fraud Detection with Intelligent Document Processing on AWS - FrontEnd"
+        frontend = FrontEndStack(self, "InsuranceClaimProcessFrontEnd")
