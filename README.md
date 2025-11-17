@@ -142,6 +142,11 @@ complete_notification_reciepients = <Comma seperated list of emails to recieve t
 ### Deploy Backend Stacks
 From the root of the project folder, run following command to deploy a documents processing workflow.
 
+Remember to bootstrap before deploying stacks.
+```bash
+$ cdk bootstrap
+```
+
 ```bash
 $ cdk deploy InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow
 ```
@@ -149,7 +154,7 @@ $ cdk deploy InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow
 Then, deploy an API stack for the UI.
 
 ```bash
-$ cdk deploy InsuranceClaimProcessStack/InsuranceClaimProcessApi
+$ cdk deploy InsuranceClaimProcessApiStack/InsuranceClaimProcessApi
 ```
 
 The above command will print out an URL for API endpoint at the end. For example:
@@ -183,7 +188,7 @@ $ npm run build
 After completion, change to the root of the project and deploy frontend UI stack using a CDK command.
 
 ```bash
-$ cdk deploy InsuranceClaimProcessStack/InsuranceClaimProcessFrontEnd
+$ cdk deploy InsuranceClaimProcessFrontEndStack/InsuranceClaimProcessFrontEnd
 ```
 
 ## Deployment Validation
