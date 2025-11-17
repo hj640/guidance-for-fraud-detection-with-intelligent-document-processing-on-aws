@@ -1,13 +1,12 @@
+import React from 'react';
 import {
   Alert,
   Grid,
   Container,
   Link,
   Box,
-  Button,
-  TextFilter,
-  Pagination,
-  CollectionPreferences,
+  StatusIndicator,
+  Badge,
   KeyValuePairs,
   ContentLayout,
   Header,
@@ -15,6 +14,9 @@ import {
   SpaceBetween,
   TextContent,
 } from "@cloudscape-design/components";
+import { API_ENDPOINT } from "../common/constants";
+
+const { useEffect } = React;
 
 function BulletList({ items }) {
   return (
@@ -28,9 +30,19 @@ function BulletList({ items }) {
   );
 }
 
+
 export default function ClaimReport(props) {
   const claimData = props.claimData;
-  console.log(claimData);
+  useEffect(() => {
+    const handleResizeObserverError = (e) => {
+      if (e.message === 'ResizeObserver loop completed with undelivered notifications.') {
+        e.stopImmediatePropagation();
+      }
+    };
+    window.addEventListener('error', handleResizeObserverError);
+    return () => window.removeEventListener('error', handleResizeObserverError);
+  }, []);
+  console.log("CLAIM DATA", claimData);
   if (claimData.length == 0) {
     return "Loading";
   }
@@ -46,18 +58,68 @@ export default function ClaimReport(props) {
                 " Policy No: " +
                 claimData.policyNo +
                 "\t|\tClaim Date: " +
-                claimData.claimInfo.dateFiled
+claimData.claimInfo.claimDate
               }
             >
               ID: {claimData.claimId}
             </Header>
             {claimData.fraudWarning && (
-              <Alert type="warning">{claimData.suspicion}</Alert>
+              <Alert type="warning"><strong>{claimData.suspicion}</strong></Alert>
             )}
           </SpaceBetween>
         }
       >
         <SpaceBetween size="l">
+          <Container
+            header={<Header variant="h2">AI Risk Assessment</Header>}
+          >
+            <SpaceBetween size="m">
+              <KeyValuePairs
+                columns={3}
+                items={[
+                  {
+                    label: "Risk Score",
+                    value: (
+                      <Badge 
+                        color={claimData.riskScore >= 8 ? "red" : claimData.riskScore >= 4 ? "grey" : "green"}
+                      >
+                        {claimData.riskScore || 'N/A'}/10
+                      </Badge>
+                    )
+                  },
+                  {
+                    label: "Recommended Action", 
+                    value: (
+                      <Badge 
+                        color={claimData.recommendedAction?.startsWith("DENY") ? "red" : 
+                              claimData.recommendedAction?.startsWith("INVESTIGATE") ? "grey" : "green"}
+                      >
+                        {claimData.recommendedAction?.split(' - ')[0] || 'N/A'}
+                      </Badge>
+                    )
+                  },
+                  {
+                    label: "Fraud Warning",
+                    value: claimData.fraudWarning ? "YES" : "NO"
+                  }
+                ]}
+              />
+
+              
+              {claimData.inconsistencies && claimData.inconsistencies.length > 0 && (
+                <Alert type="error" header="Inconsistencies Found">
+                  {claimData.inconsistencies.map((item, index) => (
+                    <div key={index}>• {item}</div>
+                  ))}
+                </Alert>
+              )}
+              
+              <Box variant="h4">AI Analysis</Box>
+              <TextContent><strong>Observations:</strong> {claimData.observations}</TextContent>
+              <TextContent><strong>Insights:</strong> {claimData.insights}</TextContent>
+            </SpaceBetween>
+          </Container>
+
           <SpaceBetween size="s">
             <Container
               header={
@@ -75,7 +137,7 @@ export default function ClaimReport(props) {
                   items={[
                     {
                       label: "Claim date",
-                      value: claimData.claimInfo.claimFiledDate,
+                      value: claimData.claimInfo.claimDate,
                     },
                     {
                       label: "Incident date",
@@ -83,15 +145,15 @@ export default function ClaimReport(props) {
                     },
                     {
                       label: "Estimated Value of Damage",
-                      value: claimData.claimInfo.estimatedValueOfDamage,
+                      value: typeof claimData.claimInfo.estimatedDamageValue === 'object' ? JSON.stringify(claimData.claimInfo.estimatedDamageValue) : claimData.claimInfo.estimatedDamageValue
                     },
                     {
                       label: "Estimated Cost of Repair",
-                      value: claimData.claimInfo.estimatedCostOfRepairs,
+                      value: typeof claimData.claimInfo.estimatedRepairCost === 'object' ? JSON.stringify(claimData.claimInfo.estimatedRepairCost) : claimData.claimInfo.estimatedRepairCost
                     },
                     {
-                      label: "Contact",
-                      value: claimData.policyInfo.agentContact,
+                      label: "Agent Contact",
+                      value: claimData.policyInfo.contact,
                     },
                     {
                       label: "Insurance Company",
@@ -114,11 +176,31 @@ export default function ClaimReport(props) {
                   },
                   {
                     label: "Type",
-                    value: claimData.propertyInfo.typeOfProperty,
+                    value: claimData.propertyInfo.type,
                   },
                 ]}
               />
-              <Box>{claimData.propertyInfo.additionalInfo}</Box>
+              {typeof claimData.propertyInfo.additionalInfo === 'object' ? (
+                <KeyValuePairs
+                  columns={2}
+                  items={[
+                    {
+                      label: "Damaged Value",
+                      value: claimData.propertyInfo.additionalInfo.damagedValue || 'N/A'
+                    },
+                    {
+                      label: "Previous Claim",
+                      value: claimData.propertyInfo.additionalInfo.previousClaim ? 'Yes' : 'No'
+                    },
+                    {
+                      label: "Repair Cost",
+                      value: claimData.propertyInfo.additionalInfo.repairCost || 'N/A'
+                    }
+                  ]}
+                />
+              ) : (
+                <Box>{claimData.propertyInfo.additionalInfo}</Box>
+              )}
               <Box variant="h4" padding={{ top: "m" }}>
                 Description of Damage
               </Box>
@@ -147,7 +229,7 @@ export default function ClaimReport(props) {
                     label: "Policy Address",
                     value: claimData.policyHolderDetails.address,
                   },
-                  {
+                  { 
                     label: "Policy No",
                     value: claimData.policyNo,
                   },
@@ -157,7 +239,7 @@ export default function ClaimReport(props) {
                   },
                   {
                     label: "Contact",
-                    value: claimData.policyInfo.agentContact,
+                    value: claimData.policyInfo.contact,
                   },
                   {
                     label: "Insurance Company",
@@ -213,11 +295,35 @@ export default function ClaimReport(props) {
                   {
                     id: "link",
                     header: "Link",
-                    cell: (item) => (
-                      <Link href={item.link} target="_blank">
-                        {item.link}
-                      </Link>
-                    ),
+                    cell: (item) => {
+                      if (item.fileName) {
+                        return (
+                          <Link 
+                            href="#" 
+                            onFollow={async (e) => {
+                              e.preventDefault();
+                              try {
+                                const token = localStorage.getItem('idToken');
+                                const response = await fetch(`${API_ENDPOINT}view-file?claimId=${claimData.claimId}&fileName=${item.fileName}`, {
+                                  headers: { 'Authorization': `Bearer ${token}` }
+                                });
+                                const data = await response.json();
+                                if (data.url) window.open(data.url, '_blank');
+                              } catch (error) {
+                                console.error('Error fetching file URL:', error);
+                              }
+                            }}
+                          >
+                            View Image
+                          </Link>
+                        );
+                      }
+                      return item.link ? (
+                        <Link href={item.link} target="_blank">
+                          {item.link}
+                        </Link>
+                      ) : 'N/A';
+                    },
                   },
                 ]}
                 columnDisplay={[
@@ -242,11 +348,15 @@ export default function ClaimReport(props) {
                 },
                 {
                   label: "Contact",
-                  value: claimData.witness.contactInformation,
+                  value: claimData.policyHolderDetails.phoneNumber,
                 },
                 {
                   label: "Relationship",
-                  value: claimData.witness.relationshipToClaimant,
+                  value: "Witness",
+                },
+                {
+                  label: "Statement",
+                  value: claimData.witness.statement,
                 },
               ]}
             />
@@ -257,7 +367,7 @@ export default function ClaimReport(props) {
                 variant="h2"
                 //description="Claim details"
               >
-                Cost Estimation
+                Cost Estimation by Vendor
               </Header>
             }
           >
@@ -274,49 +384,59 @@ export default function ClaimReport(props) {
                   cell: (item) => item.vendorName,
                 },
                 {
-                  id: "scope",
-                  header: "Scope of Work",
-                  width: 250,
-                  cell: (item) => item.scopeOfWork,
-                },
-                {
-                  id: "cost",
-                  header: "Cost",
-                  width: 150,
+                  id: "totalcost",
+                  header: "Total Cost",
+                  width: 200,
                   cell: (item) => item.totalCost,
                 },
-              ]}
+                {
+                  id: "scope",
+                  header: "Scope of Work",
+                  width: 300,
+                  cell: (item) => {
+                    if (Array.isArray(item.scopeOfWork)) {
+                      return (
+                        <div>
+                          {item.scopeOfWork.map((work, index) => {
+                            const parts = work.split(' - ');
+                            return (
+                              <div key={index}>{parts[0]}</div>
+                            );
+                          })}
+                        </div>);
+                      } 
+                      return 'N/A';
+                    }, 
+                  },
+                  {
+                    id: "cost",
+                    header: "Cost",
+                    width: 150,
+                    cell: (item) => {
+                      if (Array.isArray(item.scopeOfWork)) {
+                        return (
+                          <div>
+                            {item.scopeOfWork.map((work, index) => {
+                              const parts = work.split(' - ');
+                              return (
+                                <div key={index}>${parts[1] || '0'}</div>
+                              );
+                            })}
+                          </div>);
+                        } 
+                        return 'N/A';
+                      }, 
+                    },
+                  ]}
               columnDisplay={[
                 { id: "vendor", visible: true },
+                { id: "totalcost", visible: true },
                 { id: "scope", visible: true },
                 { id: "cost", visible: true },
               ]}
               resizableColumns
               wrapLines
             />
-          </Container>
-          <Container
-            header={
-              <Header
-                variant="h2"
-                //description="Claim details"
-              >
-                AI Generated Reviews
-              </Header>
-            }
-          >
-            <Box variant="h2" padding={{ top: "m" }}>
-              Observations
-            </Box>
-            <TextContent>
-              <p>{claimData.observations}</p>
-            </TextContent>
-            <Box variant="h2" padding={{ top: "m" }}>
-              Insights
-            </Box>
-            <TextContent>
-              <p>{claimData.insights}</p>
-            </TextContent>
           </Container>
         </SpaceBetween>
       </ContentLayout>
