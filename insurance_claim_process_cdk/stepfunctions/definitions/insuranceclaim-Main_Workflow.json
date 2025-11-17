@@ -1,8 +1,13 @@
-{
+ {
   "QueryLanguage": "JSONata",
   "Comment": "A description of my state machine",
-  "StartAt": "List Claim Documents",
+  "StartAt": "Wait for Upload Completion",
   "States": {
+    "Wait for Upload Completion": {
+      "Type": "Wait",
+      "Seconds": 10,
+      "Next": "List Claim Documents"
+    },
     "List Claim Documents": {
       "Type": "Task",
       "Arguments": {
@@ -52,31 +57,18 @@
                 "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID": "{% $states.context.Execution.Id %}"
               }
             },
-            "Next": "Validate & Transform",
-            "Output": "{% $merge([$states.input, {'documentType':$states.result.Output.documentType}])%}"
-          },
-          "Validate & Transform": {
-            "Type": "Task",
-            "Resource": "arn:aws:states:::states:startExecution.sync:2",
-            "Arguments": {
-              "StateMachineArn": "arn:aws:states:<AWS_REGION>:<AWS_ACCOUNT>:stateMachine:insuranceclaim-Validation-Transform",
-              "Input": {
-                "StatePayload": "{% $states.input%}",
-                "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID": "{% $states.context.Execution.Id %}"
-              }
-            },
             "Next": "Is this a picture?",
-            "Output": "{% $states.input %}"
+            "Output": "{% $merge([$states.input, {'documentType':$states.result.Output.documentType}])%}"
           },
           "Is this a picture?": {
             "Type": "Choice",
             "Choices": [
               {
                 "Next": "Fraud Detection- Tampered Image",
-                "Condition": "{% $states.input.documentType='Pictures' %}"
+                "Condition": "{% $states.input.documentType='Disaster Damage Assessment' %}"
               }
             ],
-            "Default": "Insight Generation"
+            "Default": "Done"
           },
           "Fraud Detection- Tampered Image": {
             "Type": "Task",
@@ -85,18 +77,6 @@
               "StateMachineArn": "arn:aws:states:<AWS_REGION>:<AWS_ACCOUNT>:stateMachine:insuranceclaim-FraudDetection",
               "Input": {
                 "StatePayload": "{% $states.input %}",
-                "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID": "{% $states.context.Execution.Id %}"
-              }
-            },
-            "Next": "Insight Generation"
-          },
-          "Insight Generation": {
-            "Type": "Task",
-            "Resource": "arn:aws:states:::states:startExecution.sync:2",
-            "Arguments": {
-              "StateMachineArn": "arn:aws:states:<AWS_REGION>:<AWS_ACCOUNT>:stateMachine:insuranceclaim-Validation-Transform",
-              "Input": {
-                "StatePayload": "Hello from Step Functions!",
                 "AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID": "{% $states.context.Execution.Id %}"
               }
             },
