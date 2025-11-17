@@ -91,7 +91,7 @@ class LambdaStack(NestedStack):
             code=lambda_.InlineCode(handler_code),
             handler="index.lambda_handler",
             timeout=Duration.seconds(300),
-            runtime=lambda_.Runtime.PYTHON_3_13,
+            runtime=lambda_.Runtime.PYTHON_3_11,
             environment={"ENDPOINT_NAME": endpoint_name},
             layers=[pandas_layer_version],
         )
