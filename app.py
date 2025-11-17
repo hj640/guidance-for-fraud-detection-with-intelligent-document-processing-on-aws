@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
-import os
 import configparser
 import aws_cdk as cdk
 from cdk_nag import AwsSolutionsChecks, NagSuppressions
 
 
 from insurance_claim_process_cdk.insurance_claim_process_stack import InsuranceClaimProcessStack
+from insurance_claim_process_cdk.insurance_claim_process_stack import InsuranceClaimProcessApiStack
+from insurance_claim_process_cdk.insurance_claim_process_stack import InsuranceClaimProcessFrontEndStack
+
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="aws_cdk")
+warnings.filterwarnings("ignore", category=UserWarning, module="cdk_nag")
+
 config = configparser.ConfigParser()
 config.read('config.ini')
 
@@ -15,8 +21,7 @@ app = cdk.App()
 # Add AwsSolutionsChecks to your entire app
 cdk.Aspects.of(app).add(AwsSolutionsChecks(verbose=True))
 
-stack = InsuranceClaimProcessStack(app, "InsuranceClaimProcessStack",
-    # If you don't specify 'env', this stack will be environment-agnostic.
+workflow_stack = InsuranceClaimProcessStack(app, "InsuranceClaimProcessStack",
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.
 
@@ -31,6 +36,14 @@ stack = InsuranceClaimProcessStack(app, "InsuranceClaimProcessStack",
     env=cdk.Environment(region=config["AWS"]["region"]),
 
     # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
+)
+
+api_stack = InsuranceClaimProcessApiStack(app, "InsuranceClaimProcessApiStack",
+    env=cdk.Environment(region=config["AWS"]["region"])
+)
+
+frontend_stack = InsuranceClaimProcessFrontEndStack(app, "InsuranceClaimProcessFrontEndStack",
+    env=cdk.Environment(region=config["AWS"]["region"])
 )
 
 nag_suppressions = [
@@ -58,10 +71,11 @@ nag_suppressions = [
     {"id": "AwsSolutions-DDB3", "reason": "Point-in-time Recovery is acceptable for non-production code."}
 ]
 
-NagSuppressions.add_stack_suppressions(
-    stack,
-    nag_suppressions,
-    apply_to_nested_stacks=True
-)
+for stack in [workflow_stack, api_stack, frontend_stack]:
+    NagSuppressions.add_stack_suppressions(
+        stack,
+        nag_suppressions,
+        apply_to_nested_stacks=True
+    )
 
 app.synth()

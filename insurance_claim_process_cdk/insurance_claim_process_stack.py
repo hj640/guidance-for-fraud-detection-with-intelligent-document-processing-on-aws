@@ -7,9 +7,9 @@ from aws_cdk import (
 )
 from constructs import Construct
 
+from insurance_claim_process_cdk.workflow import WorkflowStack
 from insurance_claim_process_cdk.api import ApiStack
 from insurance_claim_process_cdk.frontend import FrontEndStack
-from insurance_claim_process_cdk.workflow import WorkflowStack
 
 config = configparser.ConfigParser()
 config.read('config.ini')

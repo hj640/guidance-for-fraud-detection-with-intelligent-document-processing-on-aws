@@ -116,13 +116,14 @@ class FrontEndStack(Stack):
         )
 
         # Deploy React app to S3
-        aws_s3_deployment.BucketDeployment(
-            self,
-            "DeployReactApp",
-            sources=[aws_s3_deployment.Source.asset("./frontend/build")],  # Adjust the path to your React build folder
-            destination_bucket=cloudfront_bucket,
-            distribution=spa_distribution,
-            distribution_paths=["/*"]
-        )
+        if os.path.exists("./frontend/build"):
+            aws_s3_deployment.BucketDeployment(
+                self,
+                "DeployReactApp",
+                sources=[aws_s3_deployment.Source.asset("./frontend/build")],  # Adjust the path to your React build folder
+                destination_bucket=cloudfront_bucket,
+                distribution=spa_distribution,
+                distribution_paths=["/*"]
+            )
 
         CfnOutput(self, "UIDomain", value=spa_distribution.domain_name, description="API Gateway endpoint URL")
