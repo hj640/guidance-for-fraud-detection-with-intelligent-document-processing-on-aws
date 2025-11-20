@@ -1,0 +1,138 @@
+{
+ "Description": "Guidance for Fraud Detection with Intelligent Document Processing on AWS - Workflow",
+ "Metadata": {
+  "cdk_nag": {
+   "rules_to_suppress": [
+    {
+     "reason": "Server Access Logging is not required for non-production code.",
+     "id": "AwsSolutions-S1"
+    },
+    {
+     "reason": "Managed policies are acceptable for non-production code.",
+     "id": "AwsSolutions-IAM4"
+    },
+    {
+     "reason": "IAM policies are with '*' resources have been reviewed that they only have access to log destinations or resource names have prefixes.",
+     "id": "AwsSolutions-IAM5"
+    },
+    {
+     "reason": "Lambda functions have dependencies on Python 3.11",
+     "id": "AwsSolutions-L1"
+    },
+    {
+     "reason": "Token-based API is acceptable for non-production code.",
+     "id": "AwsSolutions-COG1"
+    },
+    {
+     "reason": "User pool is acceptable for non-production code.",
+     "id": "AwsSolutions-COG2"
+    },
+    {
+     "reason": "User pool is acceptable for non-production code.",
+     "id": "AwsSolutions-COG3"
+    },
+    {
+     "reason": "Access logging is acceptable for non-production code.",
+     "id": "AwsSolutions-APIG1"
+    },
+    {
+     "reason": "Request validation is acceptable for non-production code.",
+     "id": "AwsSolutions-APIG2"
+    },
+    {
+     "reason": "WAF is acceptable for non-production code.",
+     "id": "AwsSolutions-APIG3"
+    },
+    {
+     "reason": "API keys are acceptable for non-production code.",
+     "id": "AwsSolutions-APIG4"
+    },
+    {
+     "reason": "Cognito user pool is acceptable for non-production code.",
+     "id": "AwsSolutions-COG4"
+    },
+    {
+     "reason": "API steps are acceptable for non-production code.",
+     "id": "AwsSolutions-APIG6"
+    },
+    {
+     "reason": "Step function is acceptable for non-production code.",
+     "id": "AwsSolutions-SF1"
+    },
+    {
+     "reason": "X-Ray is acceptable for non-production code.",
+     "id": "AwsSolutions-SF2"
+    },
+    {
+     "reason": "SNS topic is acceptable for non-production code.",
+     "id": "AwsSolutions-SNS3"
+    },
+    {
+     "reason": "The CloudFront distribution may require Geo restrictions",
+     "id": "AwsSolutions-CFR1"
+    },
+    {
+     "reason": "The Web Application Firewall",
+     "id": "AwsSolutions-CFR2"
+    },
+    {
+     "reason": "The CloudFront distribution allows for SSLv3 or TLSv1 for HTTPS viewer connections",
+     "id": "AwsSolutions-CFR4"
+    },
+    {
+     "reason": "The CloudFront distribution does not have an associated WAFWebACL",
+     "id": "AwsSolutions-CFR7"
+    },
+    {
+     "reason": "Point-in-time Recovery is acceptable for non-production code.",
+     "id": "AwsSolutions-DDB3"
+    }
+   ]
+  }
+ },
+ "Resources": {
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zPSM7Qw1jNQTCwv1k1OydbNyUzSCy5JTM7WCagsycjP0zfWMzTUMzRRzCrOzNQtKs0rycxN1QuC0ACvtGs5PQAAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,203 @@
+{
+  "class": "Property Damage Claim Form",
+  "description": "This is a blueprint for property damage claim form.",
+  "type": "object",
+  "definitions": {
+    "claimantInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Full name of the claimant"
+        },
+        "address": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Address of the claimant"
+        },
+        "city": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "City of the claimant"
+        },
+        "state": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "State of the claimant"
+        },
+        "zipCode": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Zip code of the claimant"
+        },
+        "phoneNumber": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Phone number of the claimant"
+        },
+        "emailAddress": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Email address of the claimant"
+        }
+      }
+    },
+    "IncidentInfo": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Date when incident occurred"
+        },
+        "time": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Time when the incident occurred"
+        },
+        "location": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Location where the incident occurred"
+        },
+        "loss": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Total loss of use coverage due to incident"
+        },
+        "description": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Description of the incident"
+        }
+      }
+    },
+    "PropertyInfo": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Type of property damaged. For example, residential home, condo."
+        },
+        "address": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Address of the property"
+        },
+        "description": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Description of property damage "
+        }
+      }
+    },
+    "InsuranceInfo": {
+      "type": "object",
+      "properties": {
+        "company": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Insurance company"
+        },
+        "policyNumber": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Insurance's policy number"
+        },
+        "agentName": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Name of insurance agent "
+        },
+        "agentContact": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Contact of insurance agent "
+        }
+      }
+    },
+    "WitnessInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Name of the witness"
+        },
+        "phoneNumber": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Witness's phone number"
+        },
+        "relationship": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Relationship to the claimant"
+        },
+        "statement": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Statement made by the witness"
+        },
+        "signature": {
+          "type": "boolean",
+          "inferenceType": "explicit",
+          "instruction": "Check whether there is witness signature"
+        }
+      }
+    },
+    "AdditionalInfo": {
+      "type": "object",
+      "properties": {
+        "previousClaim": {
+          "type": "boolean",
+          "inferenceType": "explicit",
+          "instruction": "Check whether the claimant submitted the claim before "
+        },
+        "damagedValue": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Estimated value of damaged property"
+        },
+        "repairCost": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Estimated cost of repairs"
+        }
+      }
+    }
+  },
+  "properties": {
+    "claimDate": {
+      "type": "string",
+      "inferenceType": "explicit",
+      "instruction": "Date when the claim was filed."
+    },
+    "ClaimantInfo": {
+      "$ref": "#/definitions/claimantInfo",
+      "instruction": "Extract claimant's information"
+    },
+    "IncidentInfo": {
+      "$ref": "#/definitions/IncidentInfo",
+      "instruction": "Extract incident information"
+    },
+    "PropertyInfo": {
+      "$ref": "#/definitions/PropertyInfo",
+      "instruction": "Extract property information"
+    },
+    "InsuranceInfo": {
+      "$ref": "#/definitions/InsuranceInfo",
+      "instruction": "Extract insurance information"
+    },
+    "WitnessInfo": {
+      "$ref": "#/definitions/WitnessInfo",
+      "instruction": "Extract witness Information"
+    },
+    "additionalInfo": {
+      "$ref": "#/definitions/AdditionalInfo",
+      "instruction": "Extract additional information"
+    }
+  }
+}

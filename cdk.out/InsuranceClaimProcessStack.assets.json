@@ -1,0 +1,20 @@
+{
+  "version": "40.0.0",
+  "files": {
+    "1c02e21ed3555cbfb4ec5d3d864409d51e1a6455b4a755ff99b7e85fb6431ce0": {
+      "source": {
+        "path": "InsuranceClaimProcessStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-us-east-1": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-us-east-1",
+          "objectKey": "1c02e21ed3555cbfb4ec5d3d864409d51e1a6455b4a755ff99b7e85fb6431ce0.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

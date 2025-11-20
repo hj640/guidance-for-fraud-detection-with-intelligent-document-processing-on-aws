@@ -1,0 +1,1940 @@
+{
+ "Metadata": {
+  "cdk_nag": {
+   "rules_to_suppress": [
+    {
+     "reason": "Server Access Logging is not required for non-production code.",
+     "id": "AwsSolutions-S1"
+    },
+    {
+     "reason": "Managed policies are acceptable for non-production code.",
+     "id": "AwsSolutions-IAM4"
+    },
+    {
+     "reason": "IAM policies are with '*' resources have been reviewed that they only have access to log destinations or resource names have prefixes.",
+     "id": "AwsSolutions-IAM5"
+    },
+    {
+     "reason": "Lambda functions have dependencies on Python 3.11",
+     "id": "AwsSolutions-L1"
+    },
+    {
+     "reason": "Token-based API is acceptable for non-production code.",
+     "id": "AwsSolutions-COG1"
+    },
+    {
+     "reason": "User pool is acceptable for non-production code.",
+     "id": "AwsSolutions-COG2"
+    },
+    {
+     "reason": "User pool is acceptable for non-production code.",
+     "id": "AwsSolutions-COG3"
+    },
+    {
+     "reason": "Access logging is acceptable for non-production code.",
+     "id": "AwsSolutions-APIG1"
+    },
+    {
+     "reason": "Request validation is acceptable for non-production code.",
+     "id": "AwsSolutions-APIG2"
+    },
+    {
+     "reason": "WAF is acceptable for non-production code.",
+     "id": "AwsSolutions-APIG3"
+    },
+    {
+     "reason": "API keys are acceptable for non-production code.",
+     "id": "AwsSolutions-APIG4"
+    },
+    {
+     "reason": "Cognito user pool is acceptable for non-production code.",
+     "id": "AwsSolutions-COG4"
+    },
+    {
+     "reason": "API steps are acceptable for non-production code.",
+     "id": "AwsSolutions-APIG6"
+    },
+    {
+     "reason": "Step function is acceptable for non-production code.",
+     "id": "AwsSolutions-SF1"
+    },
+    {
+     "reason": "X-Ray is acceptable for non-production code.",
+     "id": "AwsSolutions-SF2"
+    },
+    {
+     "reason": "SNS topic is acceptable for non-production code.",
+     "id": "AwsSolutions-SNS3"
+    },
+    {
+     "reason": "The CloudFront distribution may require Geo restrictions",
+     "id": "AwsSolutions-CFR1"
+    },
+    {
+     "reason": "The Web Application Firewall",
+     "id": "AwsSolutions-CFR2"
+    },
+    {
+     "reason": "The CloudFront distribution allows for SSLv3 or TLSv1 for HTTPS viewer connections",
+     "id": "AwsSolutions-CFR4"
+    },
+    {
+     "reason": "The CloudFront distribution does not have an associated WAFWebACL",
+     "id": "AwsSolutions-CFR7"
+    },
+    {
+     "reason": "Point-in-time Recovery is acceptable for non-production code.",
+     "id": "AwsSolutions-DDB3"
+    }
+   ]
+  }
+ },
+ "Resources": {
+  "InsuranceClaimProcessUserPoolF26ED7CE": {
+   "Type": "AWS::Cognito::UserPool",
+   "Properties": {
+    "AccountRecoverySetting": {
+     "RecoveryMechanisms": [
+      {
+       "Name": "verified_phone_number",
+       "Priority": 1
+      },
+      {
+       "Name": "verified_email",
+       "Priority": 2
+      }
+     ]
+    },
+    "AdminCreateUserConfig": {
+     "AllowAdminCreateUserOnly": false
+    },
+    "AutoVerifiedAttributes": [
+     "email"
+    ],
+    "EmailVerificationMessage": "The verification code to your new account is {####}",
+    "EmailVerificationSubject": "Verify your new account",
+    "Policies": {
+     "PasswordPolicy": {
+      "MinimumLength": 8,
+      "RequireLowercase": true,
+      "RequireNumbers": true,
+      "RequireSymbols": true,
+      "RequireUppercase": true
+     }
+    },
+    "SmsVerificationMessage": "The verification code to your new account is {####}",
+    "UserPoolName": "insurance_claim_demo_users",
+    "VerificationMessageTemplate": {
+     "DefaultEmailOption": "CONFIRM_WITH_CODE",
+     "EmailMessage": "The verification code to your new account is {####}",
+     "EmailSubject": "Verify your new account",
+     "SmsMessage": "The verification code to your new account is {####}"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimProcessUserPool/Resource"
+   }
+  },
+  "EmployeeAssistantClient91DF284A": {
+   "Type": "AWS::Cognito::UserPoolClient",
+   "Properties": {
+    "AllowedOAuthFlows": [
+     "implicit",
+     "code"
+    ],
+    "AllowedOAuthFlowsUserPoolClient": true,
+    "AllowedOAuthScopes": [
+     "profile",
+     "phone",
+     "email",
+     "openid",
+     "aws.cognito.signin.user.admin"
+    ],
+    "CallbackURLs": [
+     "https://example.com"
+    ],
+    "ClientName": "insurance_claim_demo_client",
+    "GenerateSecret": false,
+    "SupportedIdentityProviders": [
+     "COGNITO"
+    ],
+    "UserPoolId": {
+     "Ref": "InsuranceClaimProcessUserPoolF26ED7CE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/EmployeeAssistantClient/Resource"
+   }
+  },
+  "ApiGatewayLogs22899D9B": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "RetentionInDays": 7
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/ApiGatewayLogs/Resource"
+   }
+  },
+  "InsuranceClaimApi831C87C0": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Description": "API for insurance claim processing",
+    "Name": "Insurance Claim API"
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Resource"
+   }
+  },
+  "InsuranceClaimApiDeployment90FC78F2be49024d55536964bf1849a91f2c2f58": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "API for insurance claim processing",
+    "RestApiId": {
+     "Ref": "InsuranceClaimApi831C87C0"
+    }
+   },
+   "DependsOn": [
+    "InsuranceClaimApigetclaimreportGET9EB1B868",
+    "InsuranceClaimApigetclaimreportOPTIONS926B53D6",
+    "InsuranceClaimApigetclaimreport8B742BEE",
+    "InsuranceClaimApigetclaimsGETD1A62DA2",
+    "InsuranceClaimApigetclaimsOPTIONS4A62B33E",
+    "InsuranceClaimApigetclaimsD8C9662F",
+    "InsuranceClaimApigetpresignedposturlGETB5E5048E",
+    "InsuranceClaimApigetpresignedposturlOPTIONS890B9F0E",
+    "InsuranceClaimApigetpresignedposturl5B3A309D",
+    "InsuranceClaimApiOPTIONS2E50A83E",
+    "InsuranceClaimApistartclaimprocessingGETB19A8110",
+    "InsuranceClaimApistartclaimprocessingOPTIONS56BA87DE",
+    "InsuranceClaimApistartclaimprocessing5E812747",
+    "InsuranceClaimProcessAuthorizer2DD34A06"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Deployment/Resource"
+   }
+  },
+  "InsuranceClaimApiDeploymentStagedevA311EE16": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "InsuranceClaimApiDeployment90FC78F2be49024d55536964bf1849a91f2c2f58"
+    },
+    "MethodSettings": [
+     {
+      "DataTraceEnabled": true,
+      "HttpMethod": "*",
+      "MetricsEnabled": true,
+      "ResourcePath": "/*"
+     }
+    ],
+    "RestApiId": {
+     "Ref": "InsuranceClaimApi831C87C0"
+    },
+    "StageName": "dev"
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/DeploymentStage.dev/Resource"
+   }
+  },
+  "InsuranceClaimApiOPTIONS2E50A83E": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'*'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'",
+        "method.response.header.Access-Control-Max-Age": "'300'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Max-Age": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "InsuranceClaimApi831C87C0",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "InsuranceClaimApi831C87C0"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/OPTIONS/Resource"
+   }
+  },
+  "InsuranceClaimApigetclaimsD8C9662F": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "InsuranceClaimApi831C87C0",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "get-claims",
+    "RestApiId": {
+     "Ref": "InsuranceClaimApi831C87C0"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-claims/Resource"
+   }
+  },
+  "InsuranceClaimApigetclaimsOPTIONS4A62B33E": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'*'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'",
+        "method.response.header.Access-Control-Max-Age": "'300'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Max-Age": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "InsuranceClaimApigetclaimsD8C9662F"
+    },
+    "RestApiId": {
+     "Ref": "InsuranceClaimApi831C87C0"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-claims/OPTIONS/Resource"
+   }
+  },
+  "InsuranceClaimApigetclaimsGETApiPermissionInsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449GETgetclaims054E09C8": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ClaimsE8D96B24",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "InsuranceClaimApi831C87C0"
+       },
+       "/",
+       {
+        "Ref": "InsuranceClaimApiDeploymentStagedevA311EE16"
+       },
+       "/GET/get-claims"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-claims/GET/ApiPermission.InsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449.GET..get-claims"
+   }
+  },
+  "InsuranceClaimApigetclaimsGETApiPermissionTestInsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449GETgetclaims8EA3DCD9": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ClaimsE8D96B24",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "InsuranceClaimApi831C87C0"
+       },
+       "/test-invoke-stage/GET/get-claims"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-claims/GET/ApiPermission.Test.InsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449.GET..get-claims"
+   }
+  },
+  "InsuranceClaimApigetclaimsGETD1A62DA2": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "COGNITO_USER_POOLS",
+    "AuthorizerId": {
+     "Ref": "InsuranceClaimProcessAuthorizer2DD34A06"
+    },
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Origin": "'*'"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:",
+        {
+         "Ref": "AWS::Region"
+        },
+        ":lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ClaimsE8D96B24",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Origin": true
+      },
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "InsuranceClaimApigetclaimsD8C9662F"
+    },
+    "RestApiId": {
+     "Ref": "InsuranceClaimApi831C87C0"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-claims/GET/Resource"
+   }
+  },
+  "InsuranceClaimApigetclaimreport8B742BEE": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "InsuranceClaimApi831C87C0",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "get-claim-report",
+    "RestApiId": {
+     "Ref": "InsuranceClaimApi831C87C0"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-claim-report/Resource"
+   }
+  },
+  "InsuranceClaimApigetclaimreportOPTIONS926B53D6": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'*'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'",
+        "method.response.header.Access-Control-Max-Age": "'300'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Max-Age": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "InsuranceClaimApigetclaimreport8B742BEE"
+    },
+    "RestApiId": {
+     "Ref": "InsuranceClaimApi831C87C0"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-claim-report/OPTIONS/Resource"
+   }
+  },
+  "InsuranceClaimApigetclaimreportGETApiPermissionInsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449GETgetclaimreportEF45315A": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ClaimReport4C96A1EA",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "InsuranceClaimApi831C87C0"
+       },
+       "/",
+       {
+        "Ref": "InsuranceClaimApiDeploymentStagedevA311EE16"
+       },
+       "/GET/get-claim-report"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-claim-report/GET/ApiPermission.InsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449.GET..get-claim-report"
+   }
+  },
+  "InsuranceClaimApigetclaimreportGETApiPermissionTestInsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449GETgetclaimreport891D023C": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ClaimReport4C96A1EA",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "InsuranceClaimApi831C87C0"
+       },
+       "/test-invoke-stage/GET/get-claim-report"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-claim-report/GET/ApiPermission.Test.InsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449.GET..get-claim-report"
+   }
+  },
+  "InsuranceClaimApigetclaimreportGET9EB1B868": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "COGNITO_USER_POOLS",
+    "AuthorizerId": {
+     "Ref": "InsuranceClaimProcessAuthorizer2DD34A06"
+    },
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Origin": "'*'"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:",
+        {
+         "Ref": "AWS::Region"
+        },
+        ":lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ClaimReport4C96A1EA",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Origin": true
+      },
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "InsuranceClaimApigetclaimreport8B742BEE"
+    },
+    "RestApiId": {
+     "Ref": "InsuranceClaimApi831C87C0"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-claim-report/GET/Resource"
+   }
+  },
+  "InsuranceClaimApigetpresignedposturl5B3A309D": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "InsuranceClaimApi831C87C0",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "get-presigned-post-url",
+    "RestApiId": {
+     "Ref": "InsuranceClaimApi831C87C0"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-presigned-post-url/Resource"
+   }
+  },
+  "InsuranceClaimApigetpresignedposturlOPTIONS890B9F0E": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'*'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'",
+        "method.response.header.Access-Control-Max-Age": "'300'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Max-Age": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "InsuranceClaimApigetpresignedposturl5B3A309D"
+    },
+    "RestApiId": {
+     "Ref": "InsuranceClaimApi831C87C0"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-presigned-post-url/OPTIONS/Resource"
+   }
+  },
+  "InsuranceClaimApigetpresignedposturlGETApiPermissionInsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449GETgetpresignedposturl268DD642": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "PresignedPostUrl3484D613",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "InsuranceClaimApi831C87C0"
+       },
+       "/",
+       {
+        "Ref": "InsuranceClaimApiDeploymentStagedevA311EE16"
+       },
+       "/GET/get-presigned-post-url"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-presigned-post-url/GET/ApiPermission.InsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449.GET..get-presigned-post-url"
+   }
+  },
+  "InsuranceClaimApigetpresignedposturlGETApiPermissionTestInsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449GETgetpresignedposturl5EE2E9AA": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "PresignedPostUrl3484D613",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "InsuranceClaimApi831C87C0"
+       },
+       "/test-invoke-stage/GET/get-presigned-post-url"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-presigned-post-url/GET/ApiPermission.Test.InsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449.GET..get-presigned-post-url"
+   }
+  },
+  "InsuranceClaimApigetpresignedposturlGETB5E5048E": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "COGNITO_USER_POOLS",
+    "AuthorizerId": {
+     "Ref": "InsuranceClaimProcessAuthorizer2DD34A06"
+    },
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Origin": "'*'"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:",
+        {
+         "Ref": "AWS::Region"
+        },
+        ":lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "PresignedPostUrl3484D613",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Origin": true
+      },
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "InsuranceClaimApigetpresignedposturl5B3A309D"
+    },
+    "RestApiId": {
+     "Ref": "InsuranceClaimApi831C87C0"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-presigned-post-url/GET/Resource"
+   }
+  },
+  "InsuranceClaimApistartclaimprocessing5E812747": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "InsuranceClaimApi831C87C0",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "start-claim-processing",
+    "RestApiId": {
+     "Ref": "InsuranceClaimApi831C87C0"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/start-claim-processing/Resource"
+   }
+  },
+  "InsuranceClaimApistartclaimprocessingOPTIONS56BA87DE": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'*'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'",
+        "method.response.header.Access-Control-Max-Age": "'300'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Max-Age": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "InsuranceClaimApistartclaimprocessing5E812747"
+    },
+    "RestApiId": {
+     "Ref": "InsuranceClaimApi831C87C0"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/start-claim-processing/OPTIONS/Resource"
+   }
+  },
+  "InsuranceClaimApistartclaimprocessingGETApiPermissionInsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449GETstartclaimprocessing2645684D": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "StartClaimProcessingC3E83B69",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "InsuranceClaimApi831C87C0"
+       },
+       "/",
+       {
+        "Ref": "InsuranceClaimApiDeploymentStagedevA311EE16"
+       },
+       "/GET/start-claim-processing"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/start-claim-processing/GET/ApiPermission.InsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449.GET..start-claim-processing"
+   }
+  },
+  "InsuranceClaimApistartclaimprocessingGETApiPermissionTestInsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449GETstartclaimprocessing9AB70140": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "StartClaimProcessingC3E83B69",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "InsuranceClaimApi831C87C0"
+       },
+       "/test-invoke-stage/GET/start-claim-processing"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/start-claim-processing/GET/ApiPermission.Test.InsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449.GET..start-claim-processing"
+   }
+  },
+  "InsuranceClaimApistartclaimprocessingGETB19A8110": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "COGNITO_USER_POOLS",
+    "AuthorizerId": {
+     "Ref": "InsuranceClaimProcessAuthorizer2DD34A06"
+    },
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Origin": "'*'"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:",
+        {
+         "Ref": "AWS::Region"
+        },
+        ":lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "StartClaimProcessingC3E83B69",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Origin": true
+      },
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "InsuranceClaimApistartclaimprocessing5E812747"
+    },
+    "RestApiId": {
+     "Ref": "InsuranceClaimApi831C87C0"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/start-claim-processing/GET/Resource"
+   }
+  },
+  "InsuranceClaimProcessAuthorizer2DD34A06": {
+   "Type": "AWS::ApiGateway::Authorizer",
+   "Properties": {
+    "IdentitySource": "method.request.header.Authorization",
+    "Name": "InsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimProcessAuthorizerF8652947",
+    "ProviderARNs": [
+     {
+      "Fn::GetAtt": [
+       "InsuranceClaimProcessUserPoolF26ED7CE",
+       "Arn"
+      ]
+     }
+    ],
+    "RestApiId": {
+     "Ref": "InsuranceClaimApi831C87C0"
+    },
+    "Type": "COGNITO_USER_POOLS"
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimProcessAuthorizer/Resource"
+   }
+  },
+  "ClaimReportServiceRole504CD763": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/ClaimReport/ServiceRole/Resource"
+   }
+  },
+  "ClaimReportServiceRoleDefaultPolicyBE9D3924": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:aws:dynamodb:",
+          {
+           "Ref": "AWS::Region"
+          },
+          ":",
+          {
+           "Ref": "AWS::AccountId"
+          },
+          ":table/insuranceclaim-reports-json"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ClaimReportServiceRoleDefaultPolicyBE9D3924",
+    "Roles": [
+     {
+      "Ref": "ClaimReportServiceRole504CD763"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/ClaimReport/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "ClaimReport4C96A1EA": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "\"\"\"\nA lambda function which retrieves claim report from a dynamodb table insuranceclaim-reports-json using a partition key claimId\n\"\"\"\nimport boto3\nimport json\n\ndynamodb = boto3.resource('dynamodb')\ntable = dynamodb.Table('insuranceclaim-reports-json')\n\ndef lambda_handler(event, context):\n\n    claim_id = event[\"queryStringParameters\"]['claimId']\n    response = table.get_item(Key={'claimId': claim_id})\n    item = response['Item']\n    return {\n        'statusCode': 200,\n        'body': json.dumps(item, default = str),\n        'headers': {\n            \"Access-Control-Allow-Origin\": \"*\", # Required for CORS support to work\n            \"Access-Control-Allow-Credentials\": True, # Required for cookies, authorization headers with HTTPS\n        },\n    }"
+    },
+    "FunctionName": "insuranceclaimApiGetClaimReport",
+    "Handler": "index.lambda_handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "ClaimReportServiceRole504CD763",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.13",
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "ClaimReportServiceRoleDefaultPolicyBE9D3924",
+    "ClaimReportServiceRole504CD763"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/ClaimReport/Resource"
+   }
+  },
+  "ClaimsServiceRoleC40771E6": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/Claims/ServiceRole/Resource"
+   }
+  },
+  "ClaimsServiceRoleDefaultPolicyBADFA3BC": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "dynamodb:Scan",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:aws:dynamodb:",
+          {
+           "Ref": "AWS::Region"
+          },
+          ":",
+          {
+           "Ref": "AWS::AccountId"
+          },
+          ":table/insuranceclaim-reports-json"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ClaimsServiceRoleDefaultPolicyBADFA3BC",
+    "Roles": [
+     {
+      "Ref": "ClaimsServiceRoleC40771E6"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/Claims/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "ClaimsE8D96B24": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "\"\"\"\nA lambda function which retrieves claims from a dynamodb table insuranceclaim-reports-json\n\"\"\"\nimport boto3\nimport json\n\ndynamodb = boto3.resource('dynamodb')\n\ndef lambda_handler(event, context):\n\n    table = dynamodb.Table('insuranceclaim-reports-json')\n    response = table.scan(ProjectionExpression = 'claimId, claimInfo, incidentInfo')\n    claims = response.get('Items', [])\n    claims = [\n        {\n            \"claimId\":claim[\"claimId\"],\n            \"claimFileDate\":claim[\"claimInfo\"].get(\"claimFiledDate\", \"Unknown\"),\n            \"incidentDate\":claim[\"incidentInfo\"].get(\"date\", \"Unknown\"),\n            \"description\":claim[\"incidentInfo\"].get(\"description\", \"Unknown\")\n        } for claim in claims\n    ]\n    print(claims)\n    return {\n        'statusCode': 200,\n        'body': json.dumps(claims, default = str),\n        'headers': {\n            \"Access-Control-Allow-Origin\": \"*\", # Required for CORS support to work\n            \"Access-Control-Allow-Credentials\": True, # Required for cookies, authorization headers with HTTPS\n        },\n    }"
+    },
+    "FunctionName": "insuranceclaimApiGetClaims",
+    "Handler": "index.lambda_handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "ClaimsServiceRoleC40771E6",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.13",
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "ClaimsServiceRoleDefaultPolicyBADFA3BC",
+    "ClaimsServiceRoleC40771E6"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/Claims/Resource"
+   }
+  },
+  "PresignedPostUrlServiceRole4EA7E726": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/PresignedPostUrl/ServiceRole/Resource"
+   }
+  },
+  "PresignedPostUrlServiceRoleDefaultPolicy5B12331E": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:PutObject"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:s3:::insuranceclaim-input-",
+           {
+            "Ref": "AWS::AccountId"
+           },
+           "-",
+           {
+            "Ref": "AWS::Region"
+           },
+           "/*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:s3:::insuranceclaim-input-",
+           {
+            "Ref": "AWS::AccountId"
+           },
+           "-",
+           {
+            "Ref": "AWS::Region"
+           }
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PresignedPostUrlServiceRoleDefaultPolicy5B12331E",
+    "Roles": [
+     {
+      "Ref": "PresignedPostUrlServiceRole4EA7E726"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/PresignedPostUrl/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "PresignedPostUrl3484D613": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "import boto3\nimport os\nimport random\nimport json\n\n# Initialize S3 client\ns3_client = boto3.client('s3',\n    region_name=os.environ.get('AWS_REGION')\n)\n\nUPLOAD_BUCKET = os.environ.get('INPUT_BUCKET')  # Replace this value with your bucket name!\nURL_EXPIRATION_SECONDS = 300     # Specify how long the pre-signed URL will be valid for\n\ndef lambda_handler(event, context):\n    file_name = event['queryStringParameters']['file']\n    claim_id = event['queryStringParameters']['claim_id']\n    # Generate a random filename\n    key = f\"{claim_id}/{file_name}\"  # Random filename we will use when uploading files\n    \n    # Parameters for the pre-signed URL\n    s3_params = {\n        'Bucket': UPLOAD_BUCKET,\n        'Key': key,\n        'ContentType': 'application/octet-stream',\n        'Expires': URL_EXPIRATION_SECONDS\n    }\n    \n    try:\n        # Generate the presigned URL\n        upload_url = s3_client.generate_presigned_url(\n            ClientMethod='put_object',\n            Params=s3_params\n        )\n        \n        # Prepare the response\n        response = {\n            \"statusCode\": 200,\n            \"isBase64Encoded\": False,\n            \"headers\": {\n                \"Access-Control-Allow-Origin\": \"*\"\n            },\n            \"body\": json.dumps({\n                \"uploadURL\": upload_url,\n                \"filename\": key\n            })\n        }\n        \n        return response\n        \n    except Exception as e:\n        return {\n            \"statusCode\": 500,\n            \"body\": json.dumps({\"error\": str(e)})\n        }"
+    },
+    "Environment": {
+     "Variables": {
+      "INPUT_BUCKET": {
+       "Fn::Join": [
+        "",
+        [
+         "insuranceclaim-input-",
+         {
+          "Ref": "AWS::AccountId"
+         },
+         "-",
+         {
+          "Ref": "AWS::Region"
+         }
+        ]
+       ]
+      }
+     }
+    },
+    "FunctionName": "insuranceclaimPresignedPostUrl",
+    "Handler": "index.lambda_handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "PresignedPostUrlServiceRole4EA7E726",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.13",
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "PresignedPostUrlServiceRoleDefaultPolicy5B12331E",
+    "PresignedPostUrlServiceRole4EA7E726"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/PresignedPostUrl/Resource"
+   }
+  },
+  "StartClaimProcessingServiceRole886B7CEB": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/StartClaimProcessing/ServiceRole/Resource"
+   }
+  },
+  "StartClaimProcessingServiceRoleDefaultPolicy73AE8CDE": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "states:StartExecution",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:aws:states:",
+          {
+           "Ref": "AWS::Region"
+          },
+          ":",
+          {
+           "Ref": "AWS::AccountId"
+          },
+          ":stateMachine:insuranceclaim-Main_Workflow"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "StartClaimProcessingServiceRoleDefaultPolicy73AE8CDE",
+    "Roles": [
+     {
+      "Ref": "StartClaimProcessingServiceRole886B7CEB"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/StartClaimProcessing/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "StartClaimProcessingC3E83B69": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "\"\"\"\nA lambda function which retrieves claim report from a dynamodb table insuranceclaim-reports-json using a partition key claimId\n\"\"\"\nimport boto3\nimport json\nimport os\n\nsfn = boto3.client('stepfunctions')\n\ndef lambda_handler(event, context):\n    account_id = context.invoked_function_arn.split(\":\")[4]\n    region = context.invoked_function_arn.split(\":\")[3]\n    bda_project_arn = os.environ['BDA_PROJECT_ARN']\n    claim_id = event[\"queryStringParameters\"]['claim_id']\n    response = sfn.start_execution(\n        stateMachineArn=f\"arn:aws:states:{region}:{account_id}:stateMachine:insuranceclaim-Main_Workflow\",\n        input=json.dumps({ \"claimId\": claim_id,\n                    \"inputBucket\": f\"insuranceclaim-input-{account_id}-{region}\",\n                    \"outputBucket\": f\"insuranceclaim-output-{account_id}-{region}\",\n                    \"bdaProjectArn\": bda_project_arn})\n    )\n    \n    return {\n        'statusCode': 200,\n        'body': json.dumps(response, default = str),\n        'headers': {\n            \"Access-Control-Allow-Origin\": \"*\", # Required for CORS support to work\n            \"Access-Control-Allow-Credentials\": True, # Required for cookies, authorization headers with HTTPS\n        },\n    }"
+    },
+    "Environment": {
+     "Variables": {
+      "BDA_PROJECT_ARN": "arn:aws:bedrock:us-east-1:730076539151:data-automation-project/30fafe32db59"
+     }
+    },
+    "FunctionName": "insuranceclaimStartClaimProcessing",
+    "Handler": "index.lambda_handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "StartClaimProcessingServiceRole886B7CEB",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.13",
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "StartClaimProcessingServiceRoleDefaultPolicy73AE8CDE",
+    "StartClaimProcessingServiceRole886B7CEB"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/StartClaimProcessing/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02PT0/DMAzFP8vuaaCMA9cxBJdNVEOcUZaaziyNq/zRVKJ8dxKlGTv55+cn+/mBt09rfr8SF9vI/twoPPLw4YQ8syR9BUmDRkc8fFowHZFi22995QpbhaDd7agokSkaLA87Gt4M+Sk7KkcmJhyEg4uYeTiAdZsJs6HiC0yK5nFZfNOleANkrUDykzcSnoUFtgd3oj4PF6rTZfPC5asa1m588hr8BZNt/13KL8ZjL3hIcgdmRGuRNHv1WroMSa4cGYoxPUKq3Mq1I4Vyzm2hGDO/ezd5d00WWTeng/puzduWt4+rH4vYGK8djsAPpf4B+t1IIqgBAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/CDKMetadata/Default"
+   },
+   "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Outputs": {
+  "InsuranceClaimApiEndpointB71CD77E": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "InsuranceClaimApi831C87C0"
+      },
+      ".execute-api.",
+      {
+       "Ref": "AWS::Region"
+      },
+      ".",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "InsuranceClaimApiDeploymentStagedevA311EE16"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "UserPoolId": {
+   "Description": "Cognito User Pool ID",
+   "Value": {
+    "Ref": "InsuranceClaimProcessUserPoolF26ED7CE"
+   }
+  },
+  "UserPoolClientId": {
+   "Description": "Cognito User Pool Client ID",
+   "Value": {
+    "Ref": "EmployeeAssistantClient91DF284A"
+   }
+  }
+ },
+ "Conditions": {
+  "CDKMetadataAvailable": {
+   "Fn::Or": [
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "af-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-3"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-4"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-northwest-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-2"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "il-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "sa-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Equals": [
+      {
+       "Ref": "AWS::Region"
+      },
+      "us-west-2"
+     ]
+    }
+   ]
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

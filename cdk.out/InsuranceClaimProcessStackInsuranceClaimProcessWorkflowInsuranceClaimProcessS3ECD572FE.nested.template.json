@@ -1,0 +1,580 @@
+{
+ "Metadata": {
+  "cdk_nag": {
+   "rules_to_suppress": [
+    {
+     "reason": "Server Access Logging is not required for non-production code.",
+     "id": "AwsSolutions-S1"
+    },
+    {
+     "reason": "Managed policies are acceptable for non-production code.",
+     "id": "AwsSolutions-IAM4"
+    },
+    {
+     "reason": "IAM policies are with '*' resources have been reviewed that they only have access to log destinations or resource names have prefixes.",
+     "id": "AwsSolutions-IAM5"
+    },
+    {
+     "reason": "Lambda functions have dependencies on Python 3.11",
+     "id": "AwsSolutions-L1"
+    },
+    {
+     "reason": "Token-based API is acceptable for non-production code.",
+     "id": "AwsSolutions-COG1"
+    },
+    {
+     "reason": "User pool is acceptable for non-production code.",
+     "id": "AwsSolutions-COG2"
+    },
+    {
+     "reason": "User pool is acceptable for non-production code.",
+     "id": "AwsSolutions-COG3"
+    },
+    {
+     "reason": "Access logging is acceptable for non-production code.",
+     "id": "AwsSolutions-APIG1"
+    },
+    {
+     "reason": "Request validation is acceptable for non-production code.",
+     "id": "AwsSolutions-APIG2"
+    },
+    {
+     "reason": "WAF is acceptable for non-production code.",
+     "id": "AwsSolutions-APIG3"
+    },
+    {
+     "reason": "API keys are acceptable for non-production code.",
+     "id": "AwsSolutions-APIG4"
+    },
+    {
+     "reason": "Cognito user pool is acceptable for non-production code.",
+     "id": "AwsSolutions-COG4"
+    },
+    {
+     "reason": "API steps are acceptable for non-production code.",
+     "id": "AwsSolutions-APIG6"
+    },
+    {
+     "reason": "Step function is acceptable for non-production code.",
+     "id": "AwsSolutions-SF1"
+    },
+    {
+     "reason": "X-Ray is acceptable for non-production code.",
+     "id": "AwsSolutions-SF2"
+    },
+    {
+     "reason": "SNS topic is acceptable for non-production code.",
+     "id": "AwsSolutions-SNS3"
+    },
+    {
+     "reason": "The CloudFront distribution may require Geo restrictions",
+     "id": "AwsSolutions-CFR1"
+    },
+    {
+     "reason": "The Web Application Firewall",
+     "id": "AwsSolutions-CFR2"
+    },
+    {
+     "reason": "The CloudFront distribution allows for SSLv3 or TLSv1 for HTTPS viewer connections",
+     "id": "AwsSolutions-CFR4"
+    },
+    {
+     "reason": "The CloudFront distribution does not have an associated WAFWebACL",
+     "id": "AwsSolutions-CFR7"
+    },
+    {
+     "reason": "Point-in-time Recovery is acceptable for non-production code.",
+     "id": "AwsSolutions-DDB3"
+    }
+   ]
+  }
+ },
+ "Resources": {
+  "insuranceclaiminputbucketFC5F92EF": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "BucketName": {
+     "Fn::Join": [
+      "",
+      [
+       "insuranceclaim-input-",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       "-",
+       {
+        "Ref": "AWS::Region"
+       }
+      ]
+     ]
+    },
+    "CorsConfiguration": {
+     "CorsRules": [
+      {
+       "AllowedHeaders": [
+        "*"
+       ],
+       "AllowedMethods": [
+        "PUT"
+       ],
+       "AllowedOrigins": [
+        "*"
+       ],
+       "MaxAge": 3000
+      }
+     ]
+    },
+    "OwnershipControls": {
+     "Rules": [
+      {
+       "ObjectOwnership": "BucketOwnerEnforced"
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessS3/insuranceclaim-input-bucket/Resource"
+   }
+  },
+  "insuranceclaiminputbucketPolicy3C0CBD96": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "insuranceclaiminputbucketFC5F92EF"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:*",
+       "Condition": {
+        "Bool": {
+         "aws:SecureTransport": "false"
+        }
+       },
+       "Effect": "Deny",
+       "Principal": {
+        "AWS": "*"
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "insuranceclaiminputbucketFC5F92EF",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "insuranceclaiminputbucketFC5F92EF",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessS3/insuranceclaim-input-bucket/Policy/Resource"
+   }
+  },
+  "insuranceclaimoutputbucketC888D1A0": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "BucketName": {
+     "Fn::Join": [
+      "",
+      [
+       "insuranceclaim-output-",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       "-",
+       {
+        "Ref": "AWS::Region"
+       }
+      ]
+     ]
+    },
+    "OwnershipControls": {
+     "Rules": [
+      {
+       "ObjectOwnership": "BucketOwnerEnforced"
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessS3/insuranceclaim-output-bucket/Resource"
+   }
+  },
+  "insuranceclaimoutputbucketPolicyA9A53125": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "insuranceclaimoutputbucketC888D1A0"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:*",
+       "Condition": {
+        "Bool": {
+         "aws:SecureTransport": "false"
+        }
+       },
+       "Effect": "Deny",
+       "Principal": {
+        "AWS": "*"
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "insuranceclaimoutputbucketC888D1A0",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "insuranceclaimoutputbucketC888D1A0",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessS3/insuranceclaim-output-bucket/Policy/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zPSM7Qw1jNQTCwv1k1OydbNyUzSq/ZLLS5JTQkuSUzO1gFKxBcb61U7lSZnp5boOKflQVkQKiA/JzO5EiEM4dfW6gRUlmTk5+kb6xka6hmaKGYVZ2bqFpXmlWTmpuoFQWgASHhcEXwAAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessS3/CDKMetadata/Default"
+   },
+   "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Conditions": {
+  "CDKMetadataAvailable": {
+   "Fn::Or": [
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "af-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-3"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-4"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-northwest-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-2"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "il-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "sa-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Equals": [
+      {
+       "Ref": "AWS::Region"
+      },
+      "us-west-2"
+     ]
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,4 @@
+Rule ID,Resource ID,Compliance,Exception Reason,Rule Level,Rule Info
+"AwsSolutions-DDB3","InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessDynamoDB/insuranceclaim-bda-results-raw/Resource","Suppressed","Point-in-time Recovery is acceptable for non-production code.","Warning","The DynamoDB table does not have Point-in-time Recovery enabled."
+"AwsSolutions-DDB3","InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessDynamoDB/insuranceclaim-reports-doc/Resource","Suppressed","Point-in-time Recovery is acceptable for non-production code.","Warning","The DynamoDB table does not have Point-in-time Recovery enabled."
+"AwsSolutions-DDB3","InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessDynamoDB/insuranceclaim-reports-json/Resource","Suppressed","Point-in-time Recovery is acceptable for non-production code.","Warning","The DynamoDB table does not have Point-in-time Recovery enabled."

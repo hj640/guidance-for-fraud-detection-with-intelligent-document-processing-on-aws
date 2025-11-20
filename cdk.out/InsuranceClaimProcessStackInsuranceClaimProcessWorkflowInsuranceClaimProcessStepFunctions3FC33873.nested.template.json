@@ -1,0 +1,1749 @@
+{
+ "Metadata": {
+  "cdk_nag": {
+   "rules_to_suppress": [
+    {
+     "reason": "Server Access Logging is not required for non-production code.",
+     "id": "AwsSolutions-S1"
+    },
+    {
+     "reason": "Managed policies are acceptable for non-production code.",
+     "id": "AwsSolutions-IAM4"
+    },
+    {
+     "reason": "IAM policies are with '*' resources have been reviewed that they only have access to log destinations or resource names have prefixes.",
+     "id": "AwsSolutions-IAM5"
+    },
+    {
+     "reason": "Lambda functions have dependencies on Python 3.11",
+     "id": "AwsSolutions-L1"
+    },
+    {
+     "reason": "Token-based API is acceptable for non-production code.",
+     "id": "AwsSolutions-COG1"
+    },
+    {
+     "reason": "User pool is acceptable for non-production code.",
+     "id": "AwsSolutions-COG2"
+    },
+    {
+     "reason": "User pool is acceptable for non-production code.",
+     "id": "AwsSolutions-COG3"
+    },
+    {
+     "reason": "Access logging is acceptable for non-production code.",
+     "id": "AwsSolutions-APIG1"
+    },
+    {
+     "reason": "Request validation is acceptable for non-production code.",
+     "id": "AwsSolutions-APIG2"
+    },
+    {
+     "reason": "WAF is acceptable for non-production code.",
+     "id": "AwsSolutions-APIG3"
+    },
+    {
+     "reason": "API keys are acceptable for non-production code.",
+     "id": "AwsSolutions-APIG4"
+    },
+    {
+     "reason": "Cognito user pool is acceptable for non-production code.",
+     "id": "AwsSolutions-COG4"
+    },
+    {
+     "reason": "API steps are acceptable for non-production code.",
+     "id": "AwsSolutions-APIG6"
+    },
+    {
+     "reason": "Step function is acceptable for non-production code.",
+     "id": "AwsSolutions-SF1"
+    },
+    {
+     "reason": "X-Ray is acceptable for non-production code.",
+     "id": "AwsSolutions-SF2"
+    },
+    {
+     "reason": "SNS topic is acceptable for non-production code.",
+     "id": "AwsSolutions-SNS3"
+    },
+    {
+     "reason": "The CloudFront distribution may require Geo restrictions",
+     "id": "AwsSolutions-CFR1"
+    },
+    {
+     "reason": "The Web Application Firewall",
+     "id": "AwsSolutions-CFR2"
+    },
+    {
+     "reason": "The CloudFront distribution allows for SSLv3 or TLSv1 for HTTPS viewer connections",
+     "id": "AwsSolutions-CFR4"
+    },
+    {
+     "reason": "The CloudFront distribution does not have an associated WAFWebACL",
+     "id": "AwsSolutions-CFR7"
+    },
+    {
+     "reason": "Point-in-time Recovery is acceptable for non-production code.",
+     "id": "AwsSolutions-DDB3"
+    }
+   ]
+  }
+ },
+ "Resources": {
+  "insuranceclaimFraudDetectionsfnroleD49E7767": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "states.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Policies": [
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": [
+          "states:DescribeExecution",
+          "states:StartExecution",
+          "states:StopExecution"
+         ],
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:states:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":stateMachine:insuranceclaim-*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": "lambda:InvokeFunction",
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:lambda:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":function:insuranceclaim*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": [
+          "events:DescribeRule",
+          "events:PutRule",
+          "events:PutTargets"
+         ],
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:events:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":rule/*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": "dynamodb:UpdateItem",
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:dynamodb:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":table/insuranceclaim-*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": [
+          "logs:CreateLogDelivery",
+          "logs:DeleteLogDelivery",
+          "logs:DescribeLogGroups",
+          "logs:DescribeResourcePolicies",
+          "logs:GetLogDelivery",
+          "logs:ListLogDeliveries",
+          "logs:PutResourcePolicy",
+          "logs:UpdateLogDelivery",
+          "xray:GetSamplingRules",
+          "xray:GetSamplingTargets",
+          "xray:PutTelemetryRecords",
+          "xray:PutTraceSegments"
+         ],
+         "Effect": "Allow",
+         "Resource": "*"
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "policy_doc"
+     }
+    ],
+    "RoleName": {
+     "Fn::Join": [
+      "",
+      [
+       "insuranceclaim-FraudDetection-",
+       {
+        "Ref": "AWS::Region"
+       },
+       "-sfn-role"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-FraudDetection-sfn-role/Resource"
+   }
+  },
+  "StepFunctionsLogGroupinsuranceclaimFraudDetection65EE5A82": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/aws/vendedlogs/states/insurance-claim-insuranceclaim-FraudDetection",
+    "RetentionInDays": 7
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/StepFunctionsLogGroup-insuranceclaim-FraudDetection/Resource"
+   }
+  },
+  "insuranceclaimFraudDetection": {
+   "Type": "AWS::StepFunctions::StateMachine",
+   "Properties": {
+    "DefinitionString": {
+     "Fn::Join": [
+      "",
+      [
+       "{\n    \"QueryLanguage\": \"JSONata\",\n    \"Comment\": \"A description of my state machine\",\n    \"StartAt\": \"Lambda Invoke\",\n    \"States\": {\n      \"Lambda Invoke\": {\n        \"Type\": \"Task\",\n        \"Resource\": \"arn:aws:states:::lambda:invoke\",\n        \"Output\": \"{% $merge([$states.result.Payload, $states.input.StatePayload]) %}\",\n        \"Arguments\": {\n          \"FunctionName\": \"arn:aws:lambda:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":function:insuranceclaimImageTamperingDetection:$LATEST\",\n          \"Payload\": \"{% $states.input.StatePayload %}\"\n        },\n        \"Retry\": [\n          {\n            \"ErrorEquals\": [\n              \"Lambda.ServiceException\",\n              \"Lambda.AWSLambdaException\",\n              \"Lambda.SdkClientException\",\n              \"Lambda.TooManyRequestsException\"\n            ],\n            \"IntervalSeconds\": 1,\n            \"MaxAttempts\": 3,\n            \"BackoffRate\": 2,\n            \"JitterStrategy\": \"FULL\"\n          }\n        ],\n        \"Next\": \"Choice\"\n      },\n      \"Choice\": {\n        \"Type\": \"Choice\",\n        \"Choices\": [\n          {\n            \"Next\": \"DynamoDB UpdateItem\",\n            \"Condition\": \"{% $states.input.fraudDetect = 1 %}\"\n          }\n        ],\n        \"Default\": \"Success\"\n      },\n      \"DynamoDB UpdateItem\": {\n        \"Type\": \"Task\",\n        \"Resource\": \"arn:aws:states:::dynamodb:updateItem\",\n        \"Arguments\": {\n          \"TableName\": \"insuranceclaim-bda-results-raw\",\n          \"Key\": {\n            \"claimId\": {\n              \"S\": \"{% $states.input.claimId %}\"\n            },\n            \"name\": {\n              \"S\": \"{% $split($states.input.key, '/')[-1] %}\"\n            }\n          },\n          \"UpdateExpression\": \"SET fraudDetection = :fraudDetection\",\n          \"ExpressionAttributeValues\": {\n            \":fraudDetection\": {\n              \"S\": \"Tampered Image\"\n            }\n          }\n        },\n        \"End\": true\n      },\n      \"Success\": {\n        \"Type\": \"Succeed\"\n      }\n    }\n  }"
+      ]
+     ]
+    },
+    "LoggingConfiguration": {
+     "Destinations": [
+      {
+       "CloudWatchLogsLogGroup": {
+        "LogGroupArn": {
+         "Fn::GetAtt": [
+          "StepFunctionsLogGroupinsuranceclaimFraudDetection65EE5A82",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "IncludeExecutionData": false,
+     "Level": "ALL"
+    },
+    "RoleArn": {
+     "Fn::GetAtt": [
+      "insuranceclaimFraudDetectionsfnroleD49E7767",
+      "Arn"
+     ]
+    },
+    "StateMachineName": "insuranceclaim-FraudDetection",
+    "TracingConfiguration": {
+     "Enabled": true
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-FraudDetection"
+   }
+  },
+  "insuranceclaimIngestionsfnrole83D7A1D6": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "states.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Policies": [
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": "bedrock:InvokeDataAutomationAsync",
+         "Effect": "Allow",
+         "Resource": [
+          "arn:aws:bedrock:us-east-1:730076539151:data-automation-project/30fafe32db59",
+          {
+           "Fn::Join": [
+            "",
+            [
+             "arn:aws:bedrock:us-east-1:",
+             {
+              "Ref": "AWS::AccountId"
+             },
+             ":data-automation-profile/us.data-automation-v1"
+            ]
+           ]
+          },
+          {
+           "Fn::Join": [
+            "",
+            [
+             "arn:aws:bedrock:us-east-2:",
+             {
+              "Ref": "AWS::AccountId"
+             },
+             ":data-automation-profile/us.data-automation-v1"
+            ]
+           ]
+          },
+          {
+           "Fn::Join": [
+            "",
+            [
+             "arn:aws:bedrock:us-west-1:",
+             {
+              "Ref": "AWS::AccountId"
+             },
+             ":data-automation-profile/us.data-automation-v1"
+            ]
+           ]
+          },
+          {
+           "Fn::Join": [
+            "",
+            [
+             "arn:aws:bedrock:us-west-2:",
+             {
+              "Ref": "AWS::AccountId"
+             },
+             ":data-automation-profile/us.data-automation-v1"
+            ]
+           ]
+          }
+         ]
+        },
+        {
+         "Action": [
+          "bedrock:GetDataAutomationStatus",
+          "logs:CreateLogDelivery",
+          "logs:DeleteLogDelivery",
+          "logs:DescribeLogGroups",
+          "logs:DescribeResourcePolicies",
+          "logs:GetLogDelivery",
+          "logs:ListLogDeliveries",
+          "logs:PutResourcePolicy",
+          "logs:UpdateLogDelivery",
+          "xray:GetSamplingRules",
+          "xray:GetSamplingTargets",
+          "xray:PutTelemetryRecords",
+          "xray:PutTraceSegments"
+         ],
+         "Effect": "Allow",
+         "Resource": "*"
+        },
+        {
+         "Action": "lambda:InvokeFunction",
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:lambda:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":function:insuranceclaim*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": [
+          "states:DescribeExecution",
+          "states:StopExecution"
+         ],
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:states:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":stateMachine:insuranceclaim-*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": [
+          "events:DescribeRule",
+          "events:PutRule",
+          "events:PutTargets"
+         ],
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:events:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":rule/*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": [
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:PutObject"
+         ],
+         "Effect": "Allow",
+         "Resource": [
+          {
+           "Fn::Join": [
+            "",
+            [
+             "arn:aws:s3:::insuranceclaim-input-",
+             {
+              "Ref": "AWS::AccountId"
+             },
+             "-",
+             {
+              "Ref": "AWS::Region"
+             },
+             "/*"
+            ]
+           ]
+          },
+          {
+           "Fn::Join": [
+            "",
+            [
+             "arn:aws:s3:::insuranceclaim-input-",
+             {
+              "Ref": "AWS::AccountId"
+             },
+             "-",
+             {
+              "Ref": "AWS::Region"
+             }
+            ]
+           ]
+          },
+          {
+           "Fn::Join": [
+            "",
+            [
+             "arn:aws:s3:::insuranceclaim-output-",
+             {
+              "Ref": "AWS::AccountId"
+             },
+             "-",
+             {
+              "Ref": "AWS::Region"
+             },
+             "/*"
+            ]
+           ]
+          },
+          {
+           "Fn::Join": [
+            "",
+            [
+             "arn:aws:s3:::insuranceclaim-output-",
+             {
+              "Ref": "AWS::AccountId"
+             },
+             "-",
+             {
+              "Ref": "AWS::Region"
+             }
+            ]
+           ]
+          }
+         ]
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "policy_doc"
+     }
+    ],
+    "RoleName": {
+     "Fn::Join": [
+      "",
+      [
+       "insuranceclaim-Ingestion-",
+       {
+        "Ref": "AWS::Region"
+       },
+       "-sfn-role"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-Ingestion-sfn-role/Resource"
+   }
+  },
+  "StepFunctionsLogGroupinsuranceclaimIngestionB302ECFC": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/aws/vendedlogs/states/insurance-claim-insuranceclaim-Ingestion",
+    "RetentionInDays": 7
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/StepFunctionsLogGroup-insuranceclaim-Ingestion/Resource"
+   }
+  },
+  "insuranceclaimIngestion": {
+   "Type": "AWS::StepFunctions::StateMachine",
+   "Properties": {
+    "DefinitionString": {
+     "Fn::Join": [
+      "",
+      [
+       "{\n    \"Comment\": \"A description of my state machine\",\n    \"StartAt\": \"Is this a folder?\",\n    \"QueryLanguage\": \"JSONata\",\n    \"States\": {\n      \"Is this a folder?\": {\n        \"Type\": \"Choice\",\n        \"Default\": \"InvokeDataAutomationAsync\",\n        \"Choices\": [\n          {\n            \"Next\": \"Skip\",\n            \"Condition\": \"{% $states.input.StatePayload.size =0 %}\"\n          }\n        ],\n        \"QueryLanguage\": \"JSONata\",\n        \"Output\": \"{%$states.input.StatePayload%}\"\n      },\n      \"InvokeDataAutomationAsync\": {\n        \"Type\": \"Task\",\n        \"Arguments\": {\n          \"DataAutomationProfileArn\":\"arn:aws:bedrock:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":data-automation-profile/us.data-automation-v1\",\n          \"DataAutomationConfiguration\": {\n            \"Stage\": \"LIVE\",\n            \"DataAutomationProjectArn\": \"arn:aws:bedrock:us-east-1:730076539151:data-automation-project/30fafe32db59\"\n          },\n          \"NotificationConfiguration\": {\n            \"EventBridgeConfiguration\": {\n              \"EventBridgeEnabled\": true\n            }\n          },\n          \"InputConfiguration\": {\n            \"S3Uri\": \"{% 's3://' & $states.input.inputBucket & '/' & $states.input.key %}\"\n          },\n          \"OutputConfiguration\": {\n            \"S3Uri\": \"{% 's3://' & $states.input.outputBucket & '/' & $states.input.key %}\"\n          }\n        },\n        \"Resource\": \"arn:aws:states:::aws-sdk:bedrockdataautomationruntime:invokeDataAutomationAsync\",\n        \"Next\": \"Wait\",\n        \"QueryLanguage\": \"JSONata\",\n        \"Output\": {\n          \"inputBucket\": \"{% $states.input.inputBucket %}\",\n          \"claimId\": \"{% $states.input.claimId %}\",\n          \"key\": \"{% $states.input.key %}\",\n          \"outputBucket\": \"{% $states.input.outputBucket %}\",\n          \"InvocationArn\": \"{%$states.result.InvocationArn%}\"\n        }\n      },\n      \"Wait\": {\n        \"Type\": \"Wait\",\n        \"Seconds\": 5,\n        \"Next\": \"GetDataAutomationStatus\"\n      },\n      \"GetDataAutomationStatus\": {\n        \"Type\": \"Task\",\n        \"Arguments\": {\n          \"InvocationArn\": \"{%$states.input.InvocationArn%}\"\n        },\n        \"Resource\": \"arn:aws:states:::aws-sdk:bedrockdataautomationruntime:getDataAutomationStatus\",\n        \"Next\": \"Completed?\",\n        \"Output\": {\n          \"inputBucket\": \"{% $states.input.inputBucket %}\",\n          \"claimId\": \"{% $states.input.claimId %}\",\n          \"key\": \"{% $states.input.key %}\",\n          \"outputBucket\": \"{% $states.input.outputBucket %}\",\n          \"Status\": \"{%$states.result.Status%}\",\n          \"InvocationArn\": \"{%$states.input.InvocationArn%}\"\n        },\n        \"QueryLanguage\": \"JSONata\"\n      },\n      \"Completed?\": {\n        \"Type\": \"Choice\",\n        \"Default\": \"Wait\",\n        \"Choices\": [\n          {\n            \"Next\": \"Store Raw JSONs\",\n            \"Condition\": \"{%$states.input.Status = 'Success'%}\",\n            \"Output\": {\n              \"inputBucket\": \"{% $states.input.inputBucket %}\",\n              \"claimId\": \"{% $states.input.claimId %}\",\n              \"key\": \"{% $states.input.key %}\",\n              \"outputBucket\": \"{% $states.input.outputBucket %}\"\n            }\n          },\n          {\n            \"Next\": \"Fail\",\n            \"Condition\": \"{%$states.input.Status = 'Fail'%}\"\n          }\n        ],\n        \"QueryLanguage\": \"JSONata\"\n      },\n      \"Success\": {\n        \"Type\": \"Succeed\"\n      },\n      \"Fail\": {\n        \"Type\": \"Fail\"\n      },\n      \"Store Raw JSONs\": {\n        \"Type\": \"Task\",\n        \"Resource\": \"arn:aws:states:::lambda:invoke\",\n        \"Output\": \"{% $states.result.Payload %}\",\n        \"Next\": \"Success\",\n        \"Arguments\": {\n          \"FunctionName\": \"arn:aws:lambda:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":function:insuranceclaimRawJsonProcessing\",\n          \"Payload\": \"{% $states.input %}\"\n        },\n        \"Retry\": [\n          {\n            \"ErrorEquals\": [\n              \"Lambda.ServiceException\",\n              \"Lambda.AWSLambdaException\",\n              \"Lambda.SdkClientException\",\n              \"Lambda.TooManyRequestsException\"\n            ],\n            \"IntervalSeconds\": 1,\n            \"MaxAttempts\": 3,\n            \"BackoffRate\": 2,\n            \"JitterStrategy\": \"FULL\"\n          }\n        ],\n        \"QueryLanguage\": \"JSONata\"\n      },\n      \"Skip\": {\n        \"Type\": \"Pass\",\n        \"End\": true\n      }\n    }\n  }"
+      ]
+     ]
+    },
+    "LoggingConfiguration": {
+     "Destinations": [
+      {
+       "CloudWatchLogsLogGroup": {
+        "LogGroupArn": {
+         "Fn::GetAtt": [
+          "StepFunctionsLogGroupinsuranceclaimIngestionB302ECFC",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "IncludeExecutionData": false,
+     "Level": "ALL"
+    },
+    "RoleArn": {
+     "Fn::GetAtt": [
+      "insuranceclaimIngestionsfnrole83D7A1D6",
+      "Arn"
+     ]
+    },
+    "StateMachineName": "insuranceclaim-Ingestion",
+    "TracingConfiguration": {
+     "Enabled": true
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-Ingestion"
+   }
+  },
+  "insuranceclaimMainWorkflowsfnrole0B6549A9": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "states.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Policies": [
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": [
+          "states:DescribeExecution",
+          "states:StartExecution",
+          "states:StopExecution"
+         ],
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:states:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":stateMachine:insuranceclaim-*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": "s3:ListBucket",
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:s3:::insuranceclaim-input-",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            "-",
+            {
+             "Ref": "AWS::Region"
+            }
+           ]
+          ]
+         }
+        },
+        {
+         "Action": [
+          "events:DescribeRule",
+          "events:PutRule",
+          "events:PutTargets"
+         ],
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:events:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":rule/*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": [
+          "logs:CreateLogDelivery",
+          "logs:DeleteLogDelivery",
+          "logs:DescribeLogGroups",
+          "logs:DescribeResourcePolicies",
+          "logs:GetLogDelivery",
+          "logs:ListLogDeliveries",
+          "logs:PutResourcePolicy",
+          "logs:UpdateLogDelivery",
+          "xray:GetSamplingRules",
+          "xray:GetSamplingTargets",
+          "xray:PutTelemetryRecords",
+          "xray:PutTraceSegments"
+         ],
+         "Effect": "Allow",
+         "Resource": "*"
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "policy_doc"
+     }
+    ],
+    "RoleName": {
+     "Fn::Join": [
+      "",
+      [
+       "insuranceclaim-Main_Workflow-",
+       {
+        "Ref": "AWS::Region"
+       },
+       "-sfn-role"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-Main_Workflow-sfn-role/Resource"
+   }
+  },
+  "StepFunctionsLogGroupinsuranceclaimMainWorkflow9B0CC751": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/aws/vendedlogs/states/insurance-claim-insuranceclaim-Main_Workflow",
+    "RetentionInDays": 7
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/StepFunctionsLogGroup-insuranceclaim-Main_Workflow/Resource"
+   }
+  },
+  "insuranceclaimMainWorkflow": {
+   "Type": "AWS::StepFunctions::StateMachine",
+   "Properties": {
+    "DefinitionString": {
+     "Fn::Join": [
+      "",
+      [
+       " {\n  \"QueryLanguage\": \"JSONata\",\n  \"Comment\": \"A description of my state machine\",\n  \"StartAt\": \"Wait for Upload Completion\",\n  \"States\": {\n    \"Wait for Upload Completion\": {\n      \"Type\": \"Wait\",\n      \"Seconds\": 10,\n      \"Next\": \"List Claim Documents\"\n    },\n    \"List Claim Documents\": {\n      \"Type\": \"Task\",\n      \"Arguments\": {\n        \"Bucket\": \"{% $states.input.inputBucket %}\",\n        \"Prefix\": \"{% $states.input.claimId %}\"\n      },\n      \"Resource\": \"arn:aws:states:::aws-sdk:s3:listObjectsV2\",\n      \"Next\": \"Process Each Dcoument\",\n      \"Output\": {\n        \"listObjects\": \"{% $states.result.Contents %}\",\n        \"inputBucket\": \"{% $states.input.inputBucket %}\",\n        \"outputBucket\": \"{% $states.input.outputBucket %}\",\n        \"bdaProjectArn\": \"{% $states.input.bdaProjectArn %}\",\n        \"claimId\": \"{% $states.input.claimId %}\"\n      }\n    },\n    \"Process Each Dcoument\": {\n      \"Type\": \"Map\",\n      \"Items\": \"{% $states.input.listObjects %}\",\n      \"ItemSelector\": {\n        \"inputBucket\": \"{% $states.input.inputBucket %}\",\n        \"outputBucket\": \"{% $states.input.outputBucket %}\",\n        \"size\": \"{% $states.context.Map.Item.Value.Size %}\",\n        \"key\": \"{% $states.context.Map.Item.Value.Key %}\",\n        \"bdaProjectArn\": \"{%$states.input.bdaProjectArn%}\",\n        \"claimId\": \"{% $states.input.claimId %}\"\n      },\n      \"Output\": {\n        \"inputBucket\": \"{% $states.input.inputBucket %}\",\n        \"outputBucket\": \"{% $states.input.outputBucket %}\",\n        \"bdaProjectArn\": \"{% $states.input.bdaProjectArn %}\",\n        \"claimId\": \"{% $states.input.claimId %}\"\n      },\n      \"ItemProcessor\": {\n        \"ProcessorConfig\": {\n          \"Mode\": \"INLINE\"\n        },\n        \"StartAt\": \"Ingest\",\n        \"States\": {\n          \"Ingest\": {\n            \"Type\": \"Task\",\n            \"Resource\": \"arn:aws:states:::states:startExecution.sync:2\",\n            \"Arguments\": {\n              \"StateMachineArn\": \"arn:aws:states:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":stateMachine:insuranceclaim-Ingestion\",\n              \"Input\": {\n                \"StatePayload\": \"{% $states.input %}\",\n                \"AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID\": \"{% $states.context.Execution.Id %}\"\n              }\n            },\n            \"Next\": \"Is this a picture?\",\n            \"Output\": \"{% $merge([$states.input, {'documentType':$states.result.Output.documentType}])%}\"\n          },\n          \"Is this a picture?\": {\n            \"Type\": \"Choice\",\n            \"Choices\": [\n              {\n                \"Next\": \"Fraud Detection- Tampered Image\",\n                \"Condition\": \"{% $states.input.documentType='Disaster Damage Assessment' %}\"\n              }\n            ],\n            \"Default\": \"Done\"\n          },\n          \"Fraud Detection- Tampered Image\": {\n            \"Type\": \"Task\",\n            \"Resource\": \"arn:aws:states:::states:startExecution.sync:2\",\n            \"Arguments\": {\n              \"StateMachineArn\": \"arn:aws:states:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":stateMachine:insuranceclaim-FraudDetection\",\n              \"Input\": {\n                \"StatePayload\": \"{% $states.input %}\",\n                \"AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID\": \"{% $states.context.Execution.Id %}\"\n              }\n            },\n            \"Next\": \"Done\"\n          },\n          \"Done\": {\n            \"Type\": \"Succeed\"\n          }\n        }\n      },\n      \"Next\": \"Report Generation\"\n    },\n    \"Report Generation\": {\n      \"Type\": \"Task\",\n      \"Resource\": \"arn:aws:states:::states:startExecution.sync:2\",\n      \"Arguments\": {\n        \"StateMachineArn\": \"arn:aws:states:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":stateMachine:insuranceclaim-ReportGeneration\",\n        \"Input\": {\n          \"StatePayload\": \"{%$states.input%}\",\n          \"AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID\": \"{% $states.context.Execution.Id %}\"\n        }\n      },\n      \"Next\": \"Connect to Business Process\",\n      \"Output\": \"{%$states.input%}\"\n    },\n    \"Connect to Business Process\": {\n      \"Type\": \"Task\",\n      \"Resource\": \"arn:aws:states:::states:startExecution.sync:2\",\n      \"Arguments\": {\n        \"StateMachineArn\": \"arn:aws:states:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":stateMachine:insuranceclaim-ConnectToBusinessProcess\",\n        \"Input\": {\n          \"StatePayload\": \"{%$states.input %}\",\n          \"AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID\": \"{% $states.context.Execution.Id %}\"\n        }\n      },\n      \"End\": true\n    }\n  }\n}\n"
+      ]
+     ]
+    },
+    "LoggingConfiguration": {
+     "Destinations": [
+      {
+       "CloudWatchLogsLogGroup": {
+        "LogGroupArn": {
+         "Fn::GetAtt": [
+          "StepFunctionsLogGroupinsuranceclaimMainWorkflow9B0CC751",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "IncludeExecutionData": false,
+     "Level": "ALL"
+    },
+    "RoleArn": {
+     "Fn::GetAtt": [
+      "insuranceclaimMainWorkflowsfnrole0B6549A9",
+      "Arn"
+     ]
+    },
+    "StateMachineName": "insuranceclaim-Main_Workflow",
+    "TracingConfiguration": {
+     "Enabled": true
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-Main_Workflow"
+   }
+  },
+  "insuranceclaimReportGenerationsfnrole1049CEA8": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "states.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Policies": [
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": [
+          "states:DescribeExecution",
+          "states:StartExecution",
+          "states:StopExecution"
+         ],
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:states:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":stateMachine:insuranceclaim-*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": "lambda:InvokeFunction",
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:lambda:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":function:insuranceclaim*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": [
+          "bedrock:InvokeModel",
+          "bedrock:InvokeModelWithResponseStream"
+         ],
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:bedrock:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":inference-profile/us.*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": [
+          "bedrock:InvokeModel",
+          "bedrock:InvokeModelWithResponseStream"
+         ],
+         "Condition": {
+          "StringLike": {
+           "bedrock:InferenceProfileArn": {
+            "Fn::Join": [
+             "",
+             [
+              "arn:aws:bedrock:us-east-1:",
+              {
+               "Ref": "AWS::AccountId"
+              },
+              ":inference-profile/us.*"
+             ]
+            ]
+           }
+          }
+         },
+         "Effect": "Allow",
+         "Resource": [
+          "arn:aws:bedrock:us-east-1::foundation-model/*",
+          "arn:aws:bedrock:us-east-2::foundation-model/*",
+          "arn:aws:bedrock:us-west-1::foundation-model/*",
+          "arn:aws:bedrock:us-west-2::foundation-model/*"
+         ]
+        },
+        {
+         "Action": [
+          "events:DescribeRule",
+          "events:PutRule",
+          "events:PutTargets"
+         ],
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:events:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":rule/*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": [
+          "logs:CreateLogDelivery",
+          "logs:DeleteLogDelivery",
+          "logs:DescribeLogGroups",
+          "logs:DescribeResourcePolicies",
+          "logs:GetLogDelivery",
+          "logs:ListLogDeliveries",
+          "logs:PutResourcePolicy",
+          "logs:UpdateLogDelivery",
+          "xray:GetSamplingRules",
+          "xray:GetSamplingTargets",
+          "xray:PutTelemetryRecords",
+          "xray:PutTraceSegments"
+         ],
+         "Effect": "Allow",
+         "Resource": "*"
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "policy_doc"
+     }
+    ],
+    "RoleName": {
+     "Fn::Join": [
+      "",
+      [
+       "insuranceclaim-ReportGeneration-",
+       {
+        "Ref": "AWS::Region"
+       },
+       "-sfn-role"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-ReportGeneration-sfn-role/Resource"
+   }
+  },
+  "StepFunctionsLogGroupinsuranceclaimReportGenerationE676E607": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/aws/vendedlogs/states/insurance-claim-insuranceclaim-ReportGeneration",
+    "RetentionInDays": 7
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/StepFunctionsLogGroup-insuranceclaim-ReportGeneration/Resource"
+   }
+  },
+  "insuranceclaimReportGeneration": {
+   "Type": "AWS::StepFunctions::StateMachine",
+   "Properties": {
+    "DefinitionString": {
+     "Fn::Join": [
+      "",
+      [
+       "{\n    \"Comment\": \"A description of my state machine\",\n    \"StartAt\": \"Prompt Prep for JSON generation\",\n    \"States\": {\n      \"Prompt Prep for JSON generation\": {\n        \"Type\": \"Task\",\n        \"Resource\": \"arn:aws:states:::lambda:invoke\",\n        \"Output\": \"{% $merge([$states.input.StatePayload, {\\\"prompt\\\": $states.result.Payload}]) %}\",\n        \"Arguments\": {\n          \"FunctionName\": \"arn:aws:lambda:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":function:insuranceclaimJsonReportGeneration:$LATEST\",\n          \"Payload\": \"{% $states.input.StatePayload %}\"\n        },\n        \"Retry\": [\n          {\n            \"ErrorEquals\": [\n              \"Lambda.ServiceException\",\n              \"Lambda.AWSLambdaException\",\n              \"Lambda.SdkClientException\",\n              \"Lambda.TooManyRequestsException\"\n            ],\n            \"IntervalSeconds\": 1,\n            \"MaxAttempts\": 3,\n            \"BackoffRate\": 2,\n            \"JitterStrategy\": \"FULL\"\n          }\n        ],\n        \"Next\": \"Generate JSON\"\n      },\n      \"Generate JSON\": {\n        \"Type\": \"Task\",\n        \"Arguments\": {\n          \"ModelId\": \"us.amazon.nova-pro-v1:0\",\n          \"InferenceConfig\": {\n            \"MaxTokens\": 4096,\n            \"Temperature\": 0.2,\n            \"TopP\": 0.2\n          },\n          \"System\": \"{% $states.input.prompt.body.system %}\",\n          \"Messages\": \"{% $states.input.prompt.body.messages %}\"\n        },\n        \"Resource\": \"arn:aws:states:::aws-sdk:bedrockruntime:converse\",\n        \"Next\": \"Parallel\",\n        \"Output\": \"{% $merge([$states.result, {\\n'claimId': $states.input.claimId\\n}]) %}\"\n      },\n      \"Parallel\": {\n        \"Type\": \"Parallel\",\n        \"Branches\": [\n          {\n            \"StartAt\": \"Store JSON\",\n            \"States\": {\n              \"Store JSON\": {\n                \"Type\": \"Task\",\n                \"Resource\": \"arn:aws:states:::lambda:invoke\",\n                \"Output\": \"{% $states.result.Payload %}\",\n                \"Arguments\": {\n                  \"FunctionName\": \"arn:aws:lambda:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":function:insuranceclaim-PutItemDynamodb:$LATEST\",\n                  \"Payload\": {\n                    \"dynamodbTable\": \"insuranceclaim-reports-json\",\n                    \"body\": \"{%  $parse($replace($replace($states.input.Output.Message.Content[0].Text,'```json\\n', ''), '```',''))%}\"\n                  }\n                },\n                \"Retry\": [\n                  {\n                    \"ErrorEquals\": [\n                      \"Lambda.ServiceException\",\n                      \"Lambda.AWSLambdaException\",\n                      \"Lambda.SdkClientException\",\n                      \"Lambda.TooManyRequestsException\"\n                    ],\n                    \"IntervalSeconds\": 1,\n                    \"MaxAttempts\": 3,\n                    \"BackoffRate\": 2,\n                    \"JitterStrategy\": \"FULL\"\n                  }\n                ],\n                \"End\": true\n              }\n            }\n          },\n          {\n            \"StartAt\": \"Generate Doc\",\n            \"States\": {\n              \"Generate Doc\": {\n                \"Type\": \"Task\",\n                \"Arguments\": {\n                  \"ModelId\": \"arn:aws:bedrock:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":inference-profile/us.amazon.nova-pro-v1:0\",\n                  \"InferenceConfig\": {\n                    \"MaxTokens\": 4096,\n                    \"Temperature\": 0.3,\n                    \"TopP\": 0.3\n                  },\n                  \"System\": [\n                    {\n                      \"Text\": \"Create a HTML document of a claim report to be reviewed by a claim inspector. Input data will be given by a user as a JSON document. Output should begin with a section which states brief summary and insights on the claim case. Be sure to mention if there were any suspicious input for the claim. After the section, create back up sections using each attribute in the JSON. Visualize the data using tables and bullets.\"\n                    }\n                  ],\n                  \"Messages\": [\n                    {\n                      \"Role\": \"user\",\n                      \"Content\": [\n                        {\n                          \"Text\": \"{%$states.input.Output.Message.Content[0].Text %}\"\n                        }\n                      ]\n                    }\n                  ]\n                },\n                \"Resource\": \"arn:aws:states:::aws-sdk:bedrockruntime:converse\",\n                \"Next\": \"Store Doc\",\n                \"Output\": \"{% $merge([$states.result, {'claimId':$states.input.claimId}])%}\"\n              },\n              \"Store Doc\": {\n                \"Type\": \"Task\",\n                \"Resource\": \"arn:aws:states:::lambda:invoke\",\n                \"Output\": \"{% $states.result.Payload %}\",\n                \"Arguments\": {\n                  \"FunctionName\": \"arn:aws:lambda:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":function:insuranceclaim-PutItemDynamodb:$LATEST\",\n                  \"Payload\": {\n                    \"dynamodbTable\": \"insuranceclaim-reports-doc\",\n                    \"body\": {\n                      \"claimId\": \"{%$states.input.claimId%}\",\n                      \"doc\": \"{%  $replace($replace($states.input.Output.Message.Content[0].Text,'```html\\n', ''), '```','')%}\"\n                    }\n                  }\n                },\n                \"Retry\": [\n                  {\n                    \"ErrorEquals\": [\n                      \"Lambda.ServiceException\",\n                      \"Lambda.AWSLambdaException\",\n                      \"Lambda.SdkClientException\",\n                      \"Lambda.TooManyRequestsException\"\n                    ],\n                    \"IntervalSeconds\": 1,\n                    \"MaxAttempts\": 3,\n                    \"BackoffRate\": 2,\n                    \"JitterStrategy\": \"FULL\"\n                  }\n                ],\n                \"End\": true\n              }\n            }\n          }\n        ],\n        \"End\": true\n      }\n    },\n    \"QueryLanguage\": \"JSONata\"\n  }"
+      ]
+     ]
+    },
+    "LoggingConfiguration": {
+     "Destinations": [
+      {
+       "CloudWatchLogsLogGroup": {
+        "LogGroupArn": {
+         "Fn::GetAtt": [
+          "StepFunctionsLogGroupinsuranceclaimReportGenerationE676E607",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "IncludeExecutionData": false,
+     "Level": "ALL"
+    },
+    "RoleArn": {
+     "Fn::GetAtt": [
+      "insuranceclaimReportGenerationsfnrole1049CEA8",
+      "Arn"
+     ]
+    },
+    "StateMachineName": "insuranceclaim-ReportGeneration",
+    "TracingConfiguration": {
+     "Enabled": true
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-ReportGeneration"
+   }
+  },
+  "insuranceclaimValidationTransformsfnrole7FBEB075": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "states.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Policies": [
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": [
+          "states:DescribeExecution",
+          "states:StartExecution",
+          "states:StopExecution"
+         ],
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:states:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":stateMachine:insuranceclaim-*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": [
+          "events:DescribeRule",
+          "events:PutRule",
+          "events:PutTargets"
+         ],
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:events:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":rule/*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": [
+          "logs:CreateLogDelivery",
+          "logs:DeleteLogDelivery",
+          "logs:DescribeLogGroups",
+          "logs:DescribeResourcePolicies",
+          "logs:GetLogDelivery",
+          "logs:ListLogDeliveries",
+          "logs:PutResourcePolicy",
+          "logs:UpdateLogDelivery",
+          "xray:GetSamplingRules",
+          "xray:GetSamplingTargets",
+          "xray:PutTelemetryRecords",
+          "xray:PutTraceSegments"
+         ],
+         "Effect": "Allow",
+         "Resource": "*"
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "policy_doc"
+     }
+    ],
+    "RoleName": {
+     "Fn::Join": [
+      "",
+      [
+       "insuranceclaim-Validation-Transform-",
+       {
+        "Ref": "AWS::Region"
+       },
+       "-sfn-role"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-Validation-Transform-sfn-role/Resource"
+   }
+  },
+  "StepFunctionsLogGroupinsuranceclaimValidationTransformAA3D1E63": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/aws/vendedlogs/states/insurance-claim-insuranceclaim-Validation-Transform",
+    "RetentionInDays": 7
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/StepFunctionsLogGroup-insuranceclaim-Validation-Transform/Resource"
+   }
+  },
+  "insuranceclaimValidationTransform": {
+   "Type": "AWS::StepFunctions::StateMachine",
+   "Properties": {
+    "DefinitionString": "{\n    \"QueryLanguage\": \"JSONata\",\n    \"Comment\": \"A description of my state machine\",\n    \"StartAt\": \"Pass\",\n    \"States\": {\n      \"Pass\": {\n        \"Type\": \"Pass\",\n        \"End\": true\n      }\n    }\n}",
+    "LoggingConfiguration": {
+     "Destinations": [
+      {
+       "CloudWatchLogsLogGroup": {
+        "LogGroupArn": {
+         "Fn::GetAtt": [
+          "StepFunctionsLogGroupinsuranceclaimValidationTransformAA3D1E63",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "IncludeExecutionData": false,
+     "Level": "ALL"
+    },
+    "RoleArn": {
+     "Fn::GetAtt": [
+      "insuranceclaimValidationTransformsfnrole7FBEB075",
+      "Arn"
+     ]
+    },
+    "StateMachineName": "insuranceclaim-Validation-Transform",
+    "TracingConfiguration": {
+     "Enabled": true
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-Validation-Transform"
+   }
+  },
+  "insuranceclaimConnectToBusinessProcesssfnroleCE498A2F": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "states.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Policies": [
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": "dynamodb:GetItem",
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:dynamodb:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":table/insuranceclaim-*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": "sns:Publish",
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:sns:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":insuranceclaimClaimProcessNotification"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": [
+          "events:DescribeRule",
+          "events:PutRule",
+          "events:PutTargets"
+         ],
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:events:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":rule/*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": [
+          "states:SendTaskFailure",
+          "states:SendTaskHeartbeat",
+          "states:SendTaskSuccess"
+         ],
+         "Effect": "Allow",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:states:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":task/*"
+           ]
+          ]
+         }
+        },
+        {
+         "Action": [
+          "logs:CreateLogDelivery",
+          "logs:DeleteLogDelivery",
+          "logs:DescribeLogGroups",
+          "logs:DescribeResourcePolicies",
+          "logs:GetLogDelivery",
+          "logs:ListLogDeliveries",
+          "logs:PutResourcePolicy",
+          "logs:UpdateLogDelivery",
+          "xray:GetSamplingRules",
+          "xray:GetSamplingTargets",
+          "xray:PutTelemetryRecords",
+          "xray:PutTraceSegments"
+         ],
+         "Effect": "Allow",
+         "Resource": "*"
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "policy_doc"
+     }
+    ],
+    "RoleName": {
+     "Fn::Join": [
+      "",
+      [
+       "insuranceclaim-ConnectToBusinessProcess-",
+       {
+        "Ref": "AWS::Region"
+       },
+       "-sfn-role"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-ConnectToBusinessProcess-sfn-role/Resource"
+   }
+  },
+  "StepFunctionsLogGroupinsuranceclaimConnectToBusinessProcess78E9902D": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/aws/vendedlogs/states/insurance-claim-insuranceclaim-ConnectToBusinessProcess",
+    "RetentionInDays": 7
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/StepFunctionsLogGroup-insuranceclaim-ConnectToBusinessProcess/Resource"
+   }
+  },
+  "insuranceclaimConnectToBusinessProcess": {
+   "Type": "AWS::StepFunctions::StateMachine",
+   "Properties": {
+    "DefinitionString": {
+     "Fn::Join": [
+      "",
+      [
+       "{\n    \"Comment\": \"A description of my state machine\",\n    \"StartAt\": \"Read Notification Content\",\n    \"States\": {\n      \"Read Notification Content\": {\n        \"Type\": \"Task\",\n        \"Resource\": \"arn:aws:states:::dynamodb:getItem\",\n        \"Arguments\": {\n          \"TableName\": \"insuranceclaim-reports-doc\",\n          \"Key\": {\n            \"claimId\": {\n              \"S\": \"{% $states.input.StatePayload.claimId %}\"\n            }\n          }\n        },\n        \"Next\": \"Notify\"\n      },\n      \"Notify\": {\n        \"Type\": \"Task\",\n        \"Resource\": \"arn:aws:states:::sns:publish\",\n        \"Arguments\": {\n          \"Message\": \"{% $states.input.Item.doc.S %}\",\n          \"TopicArn\": \"arn:aws:sns:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":insuranceclaimClaimProcessNotification\",\n          \"Subject\": \"[DEMO] A new claim documents-processing has been finished\"\n        },\n        \"End\": true\n      }\n    },\n    \"QueryLanguage\": \"JSONata\"\n  }"
+      ]
+     ]
+    },
+    "LoggingConfiguration": {
+     "Destinations": [
+      {
+       "CloudWatchLogsLogGroup": {
+        "LogGroupArn": {
+         "Fn::GetAtt": [
+          "StepFunctionsLogGroupinsuranceclaimConnectToBusinessProcess78E9902D",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "IncludeExecutionData": false,
+     "Level": "ALL"
+    },
+    "RoleArn": {
+     "Fn::GetAtt": [
+      "insuranceclaimConnectToBusinessProcesssfnroleCE498A2F",
+      "Arn"
+     ]
+    },
+    "StateMachineName": "insuranceclaim-ConnectToBusinessProcess",
+    "TracingConfiguration": {
+     "Enabled": true
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-ConnectToBusinessProcess"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zWMwQ7CIBBEv6V3WMV68O7BixqDH2CQ0nYtZZsCMYb0393GeHqTmbzZgTrUsK3MO0rbDNLjE8rVxeSaezJ2EDw8CpoRiibvxLENKxfhqYtQztSdZsrT2v/zItie2hxsQgoReOKr5C7G9hhY1S5Sni2n2yf1FDY1KAVqX70iopxzSDg60D9+ASwUIaChAAAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/CDKMetadata/Default"
+   },
+   "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Conditions": {
+  "CDKMetadataAvailable": {
+   "Fn::Or": [
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "af-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-3"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-4"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-northwest-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-2"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "il-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "sa-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Equals": [
+      {
+       "Ref": "AWS::Region"
+      },
+      "us-west-2"
+     ]
+    }
+   ]
+  }
+ }
+}

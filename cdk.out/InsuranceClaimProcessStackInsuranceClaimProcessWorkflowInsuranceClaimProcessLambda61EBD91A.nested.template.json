@@ -1,0 +1,897 @@
+{
+ "Metadata": {
+  "cdk_nag": {
+   "rules_to_suppress": [
+    {
+     "reason": "Lambda functions require basic execution role for CloudWatch Logs access",
+     "id": "AwsSolutions-IAM4",
+     "applies_to": [
+      "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     ]
+    },
+    {
+     "reason": "Server Access Logging is not required for non-production code.",
+     "id": "AwsSolutions-S1"
+    },
+    {
+     "reason": "Managed policies are acceptable for non-production code.",
+     "id": "AwsSolutions-IAM4"
+    },
+    {
+     "reason": "IAM policies are with '*' resources have been reviewed that they only have access to log destinations or resource names have prefixes.",
+     "id": "AwsSolutions-IAM5"
+    },
+    {
+     "reason": "Lambda functions have dependencies on Python 3.11",
+     "id": "AwsSolutions-L1"
+    },
+    {
+     "reason": "Token-based API is acceptable for non-production code.",
+     "id": "AwsSolutions-COG1"
+    },
+    {
+     "reason": "User pool is acceptable for non-production code.",
+     "id": "AwsSolutions-COG2"
+    },
+    {
+     "reason": "User pool is acceptable for non-production code.",
+     "id": "AwsSolutions-COG3"
+    },
+    {
+     "reason": "Access logging is acceptable for non-production code.",
+     "id": "AwsSolutions-APIG1"
+    },
+    {
+     "reason": "Request validation is acceptable for non-production code.",
+     "id": "AwsSolutions-APIG2"
+    },
+    {
+     "reason": "WAF is acceptable for non-production code.",
+     "id": "AwsSolutions-APIG3"
+    },
+    {
+     "reason": "API keys are acceptable for non-production code.",
+     "id": "AwsSolutions-APIG4"
+    },
+    {
+     "reason": "Cognito user pool is acceptable for non-production code.",
+     "id": "AwsSolutions-COG4"
+    },
+    {
+     "reason": "API steps are acceptable for non-production code.",
+     "id": "AwsSolutions-APIG6"
+    },
+    {
+     "reason": "Step function is acceptable for non-production code.",
+     "id": "AwsSolutions-SF1"
+    },
+    {
+     "reason": "X-Ray is acceptable for non-production code.",
+     "id": "AwsSolutions-SF2"
+    },
+    {
+     "reason": "SNS topic is acceptable for non-production code.",
+     "id": "AwsSolutions-SNS3"
+    },
+    {
+     "reason": "The CloudFront distribution may require Geo restrictions",
+     "id": "AwsSolutions-CFR1"
+    },
+    {
+     "reason": "The Web Application Firewall",
+     "id": "AwsSolutions-CFR2"
+    },
+    {
+     "reason": "The CloudFront distribution allows for SSLv3 or TLSv1 for HTTPS viewer connections",
+     "id": "AwsSolutions-CFR4"
+    },
+    {
+     "reason": "The CloudFront distribution does not have an associated WAFWebACL",
+     "id": "AwsSolutions-CFR7"
+    },
+    {
+     "reason": "Point-in-time Recovery is acceptable for non-production code.",
+     "id": "AwsSolutions-DDB3"
+    }
+   ]
+  }
+ },
+ "Resources": {
+  "RawJsonProcessingServiceRoleF6E5E96C": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessLambda/RawJsonProcessing/ServiceRole/Resource"
+   }
+  },
+  "RawJsonProcessingServiceRoleDefaultPolicyC4D98A73": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:aws:dynamodb:",
+          {
+           "Ref": "AWS::Region"
+          },
+          ":",
+          {
+           "Ref": "AWS::AccountId"
+          },
+          ":table/insuranceclaim-bda-results-raw"
+         ]
+        ]
+       }
+      },
+      {
+       "Action": [
+        "s3:GetObject",
+        "s3:ListBucket"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:s3:::insuranceclaim-input-",
+           {
+            "Ref": "AWS::AccountId"
+           },
+           "-",
+           {
+            "Ref": "AWS::Region"
+           },
+           "/*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:s3:::insuranceclaim-input-",
+           {
+            "Ref": "AWS::AccountId"
+           },
+           "-",
+           {
+            "Ref": "AWS::Region"
+           }
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:s3:::insuranceclaim-output-",
+           {
+            "Ref": "AWS::AccountId"
+           },
+           "-",
+           {
+            "Ref": "AWS::Region"
+           },
+           "/*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:s3:::insuranceclaim-output-",
+           {
+            "Ref": "AWS::AccountId"
+           },
+           "-",
+           {
+            "Ref": "AWS::Region"
+           }
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "RawJsonProcessingServiceRoleDefaultPolicyC4D98A73",
+    "Roles": [
+     {
+      "Ref": "RawJsonProcessingServiceRoleF6E5E96C"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessLambda/RawJsonProcessing/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "RawJsonProcessingF6726202": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "\"\"\"\nA Lambda code which finds all the results.json files in S3 location, read them and store in DynamoDB\n\"\"\"\n\nimport json\nimport boto3\ns3_client = boto3.client('s3')\ndynamodb = boto3.resource('dynamodb')\nfrom decimal import Decimal\n\ndef get_json_files(bucket_name, key):\n\n    response = s3_client.list_objects_v2(\n        Bucket=bucket_name,\n        Prefix=key\n    )\n    files = [obj['Key'] for obj in response.get('Contents', []) if \"custom_output\" in obj[\"Key\"] and \"result.json\" in obj[\"Key\"]]\n    if not (len(files)):\n        files =  [obj['Key'] for obj in response.get('Contents', []) if  \"result.json\" in obj[\"Key\"]]\n    return files\n\ndef read_json_from_s3(bucket_name, file_key, source_key, claim_id):\n\n    s3_client = boto3.client('s3')\n    response = s3_client.get_object(Bucket=bucket_name, Key=file_key)\n    content = response['Body'].read().decode('utf-8')\n    json_content = json.loads(content, parse_float=Decimal)\n    \n    return {\"claimId\": claim_id, \"name\": source_key.split(\"/\")[-1], \"documentType\": json_content.get(\"matched_blueprint\", {\"name\": \"Others\"})[\"name\"], **json_content}\n\ndef lambda_handler(event, context):\n\n    bucket_name = event['outputBucket']\n    claim_id = event['claimId']\n    source_key = event[\"key\"]\n    dynamodb_table = \"insuranceclaim-bda-results-raw\"\n    \n    # Get all results.json files\n    json_files = get_json_files(bucket_name, source_key)\n\n    # Read and store. Assume there will be only one result.json\n    file_key = json_files[0]\n    print(file_key)\n    data = read_json_from_s3(bucket_name, file_key, source_key, claim_id)\n    #print(data)\n    dynamodb.Table(dynamodb_table).put_item(Item=data)\n    documentType = data[\"documentType\"]\n    name = data[\"name\"]\n    return {'statusCode': 200, \"name\":name, 'documentType': documentType}\n\n\n\n"
+    },
+    "FunctionName": "insuranceclaimRawJsonProcessing",
+    "Handler": "index.lambda_handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "RawJsonProcessingServiceRoleF6E5E96C",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.13",
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "RawJsonProcessingServiceRoleDefaultPolicyC4D98A73",
+    "RawJsonProcessingServiceRoleF6E5E96C"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessLambda/RawJsonProcessing/Resource"
+   }
+  },
+  "ImageTamperingDetectionServiceRoleE8F2F583": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessLambda/ImageTamperingDetection/ServiceRole/Resource"
+   }
+  },
+  "ImageTamperingDetectionServiceRoleDefaultPolicyEE9A6F49": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sagemaker:InvokeEndpoint",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:aws:sagemaker:",
+          {
+           "Ref": "AWS::Region"
+          },
+          ":",
+          {
+           "Ref": "AWS::AccountId"
+          },
+          ":endpoint/document-tampering-detection-v-DEMO"
+         ]
+        ]
+       }
+      },
+      {
+       "Action": [
+        "s3:GetObject",
+        "s3:ListBucket"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:s3:::insuranceclaim-input-",
+           {
+            "Ref": "AWS::AccountId"
+           },
+           "-",
+           {
+            "Ref": "AWS::Region"
+           },
+           "/*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:s3:::insuranceclaim-input-",
+           {
+            "Ref": "AWS::AccountId"
+           },
+           "-",
+           {
+            "Ref": "AWS::Region"
+           }
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ImageTamperingDetectionServiceRoleDefaultPolicyEE9A6F49",
+    "Roles": [
+     {
+      "Ref": "ImageTamperingDetectionServiceRoleE8F2F583"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessLambda/ImageTamperingDetection/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "ImageTamperingDetectionB3BA6269": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "import json\nimport boto3\nimport subprocess\nimport numpy as np\nfrom pip._internal import main\nimport sys\nimport os\nmain(['install', '-I', '-q', 'pillow', '--target', '/tmp/', '--no-cache-dir', '--disable-pip-version-check'])\nsys.path.insert(0,'/tmp/')\nfrom PIL import Image, ImageChops, ImageEnhance\n\ns3 = boto3.client(\"s3\")\nendpoint_name = os.environ['ENDPOINT_NAME']\nsagemaker_runtime = boto3.client(\n    \"sagemaker-runtime\")\n\ndef lambda_handler(event, context):\n\n    image_path = \"/tmp/\"+event['key'].split('/')[-1]\n    s3.download_file(event['inputBucket'], event['key'], image_path)\n\n\n    return {\n        \"statusCode\": 200,\n        \"fraudDetect\": check_image(image_path)\n    }\n\n\ndef convert_to_ela_image(path, quality):\n    filename = path\n    resaved_filename = '/tmp/tempresaved.jpg'\n    im = Image.open(filename)\n    bm = im.convert('RGB')\n    im.close()\n    im=bm\n    im.save(resaved_filename, 'JPEG', quality = quality)\n    resaved_im = Image.open(resaved_filename)\n    ela_im = ImageChops.difference(im, resaved_im)\n    extrema = ela_im.getextrema()\n    max_diff = max([ex[1] for ex in extrema])\n    if max_diff == 0:\n        max_diff = 1\n    scale = 255.0 / max_diff\n    ela_im = ImageEnhance.Brightness(ela_im).enhance(scale)\n    im.close()\n    bm.close()\n    resaved_im.close()\n    del filename\n    del resaved_filename\n    del im\n    del bm\n    del resaved_im\n    del extrema\n    del max_diff\n    del scale\n    return ela_im\n\n\ndef check_image(image):\n    X = []\n    X.append(np.array(convert_to_ela_image(image, 90).resize((128, 128))).flatten() / 255.0)\n    X = np.array(X)\n\n    X = X.reshape(-1, 128, 128, 3)\n    \n    data = {'instances': X.tolist()}\n    \n    # Gets inference from the model hosted at the specified endpoint:\n    response = sagemaker_runtime.invoke_endpoint(\n        EndpointName=endpoint_name, \n        Body=json.dumps(data),\n        ContentType=\"application/json\"\n        )\n\n    # Decodes and prints the response body:\n    #print(response['Body'].read().decode('utf-8'))\n    predictions_res = json.loads(response['Body'].read().decode('utf-8'))\n    predictions = predictions_res['predictions']\n    \n    print(predictions)\n    \n    pred_classes = np.argmax(predictions,axis = 1) \n    print(pred_classes)\n    return pred_classes.tolist()[0]"
+    },
+    "Environment": {
+     "Variables": {
+      "ENDPOINT_NAME": "document-tampering-detection-v-DEMO"
+     }
+    },
+    "FunctionName": "insuranceclaimImageTamperingDetection",
+    "Handler": "index.lambda_handler",
+    "Layers": [
+     "arn:aws:lambda:us-east-1:336392948345:layer:AWSSDKPandas-Python311:4"
+    ],
+    "Role": {
+     "Fn::GetAtt": [
+      "ImageTamperingDetectionServiceRoleE8F2F583",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.11",
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "ImageTamperingDetectionServiceRoleDefaultPolicyEE9A6F49",
+    "ImageTamperingDetectionServiceRoleE8F2F583"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessLambda/ImageTamperingDetection/Resource"
+   }
+  },
+  "GenerateJSONReportServiceRole8BCA0B56": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessLambda/GenerateJSONReport/ServiceRole/Resource"
+   }
+  },
+  "GenerateJSONReportServiceRoleDefaultPolicy2FBAB95B": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:Query"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:aws:dynamodb:",
+          {
+           "Ref": "AWS::Region"
+          },
+          ":",
+          {
+           "Ref": "AWS::AccountId"
+          },
+          ":table/insuranceclaim-bda-results-raw"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "GenerateJSONReportServiceRoleDefaultPolicy2FBAB95B",
+    "Roles": [
+     {
+      "Ref": "GenerateJSONReportServiceRole8BCA0B56"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessLambda/GenerateJSONReport/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "GenerateJSONReport85FD057B": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "import json\nimport boto3\nfrom boto3.dynamodb.conditions import Key\n\ndynamodb_raw_table = \"insuranceclaim-bda-results-raw\"\n\ndef lambda_handler(event, context):\n    claim_id = event[\"claimId\"]\n\n    raw = read_items_from_dynamodb(dynamodb_raw_table, claim_id)\n    print(len(raw))\n    cleansed = cleanse(raw)\n\n    messages = [ \n      { \"Role\": \"user\",\n         \"Content\": [ \n            { \n                \"Text\": '```json\\n' + json.dumps(cleansed,  default=str)+'\\n```'\n            }\n         ]\n      }\n    ]\n    system = [ \n      { \n        \"Text\": \"\"\"\n        You are an insurance claims analyst. Analyze the provided input JSON and generate a comprehensive claims assessment output.\n\n        INSTRUCTIONS:\n        1. Extract and synthesize all relevant information from the input\n        2. Cross-reference data points to identify inconsistencies or patterns\n        3. Assess validity and potential fraud indicators\n        4. Generate the output using the EXACT structure and field names below\n\n        OUTPUT JSON STRUCTURE:\n        {\n        \"callRecordingsSummary\": \"string - Summary from customer call recordings\",\n        \"claimId\": \"string - ID of the claim\",\n        \"claimInfo\": {\n            \"claimDate\": \"string - When claim was filed\",\n            \"claimantSignature\": \"string - Signature status or empty string\",\n            \"estimatedDamageValue\": \"string - Estimated damage cost with $ symbol\",\n            \"estimatedRepairCost\": \"string - Estimated repair cost with $ symbol\"\n        },\n        \"descriptionOfDamage\": \"string - Comprehensive damage summary\",\n        \"estimatesOfTotalCostToRepairPerEachVendor\": [\n            {\n            \"scopeOfWork\": [\"string array - detailed work items with costs, NO 'Total Cost' entry\"],\n            \"totalCost\": \"string - Total cost as string number\",\n            \"vendorName\": \"string - Vendor company name\"\n            }\n        ],\n        \"fraudWarning\": \"boolean - true if fraud suspected\",\n        \"incidentInfo\": {\n            \"date\": \"string - Date of incident\",\n            \"description\": \"string - What happened\",\n            \"time\": \"string - Time of incident\",\n            \"location\": \"string - Where it occurred\"\n        },\n        \"insights\": \"string - Key factors and contradictions identified\",\n        \"observations\": \"string - Validity assessment and fraud indicators\",\n        \"policyHolderDetails\": {\n            \"address\": \"string - Full address with zip\",\n            \"emailAddress\": \"string - Email\",\n            \"name\": \"string - Policy holder name\",\n            \"phoneNumber\": \"string - Phone with formatting\"\n        },\n        \"policyInfo\": {\n            \"agentName\": \"string - Agent name\",\n            \"contact\": \"string - Agent phone\",\n            \"insuranceCompany\": \"string - Company name\"\n        },\n        \"policyNo\": \"string - Policy number\",\n        \"proofOfDamage\": [\n            {\n            \"description\": \"string - Evidence description\",\n            \"fileName\": \"string - File name\",\n            \"validity\": \"string - Valid/Invalid assessment\",\n            \"type\": \"string - Evidence type\"\n            }\n        ],\n        \"propertyInfo\": {\n            \"additionalInfo\": {\n            \"damagedValue\": \"string - Property damage value with $\",\n            \"previousClaim\": \"boolean - Has previous claims\",\n            \"repairCost\": \"string - Repair cost with $\"\n            },\n            \"address\": \"string - Property address\",\n            \"type\": \"string - Property type\"\n        },\n        \"suspicion\": \"string - Specific suspicious elements identified\",\n        \"witness\": {\n            \"exists\": \"boolean - Witness available\",\n            \"name\": \"string - Witness name\",\n            \"signature\": \"boolean - Witness signed\",\n            \"statement\": \"string - Witness statement\"\n        },\n        \"riskScore\": \"number - Risk assessment from 1-10 (10 = highest fraud risk)\",\n        \"recommendedAction\": \"string - APPROVE/INVESTIGATE/DENY with brief reasoning\",\n        \"inconsistencies\": [\"string array - Specific data contradictions found during analysis\"]\n        }\n\n        ANALYSIS REQUIREMENTS:\n        - Compare timestamps, locations, and statements for consistency\n        - Evaluate damage estimates against incident severity\n        - Check for missing documentation or signatures\n        - Identify unusual patterns or red flags\n        - Calculate riskScore based on: fraud indicators (4 pts), missing docs (2 pts), inconsistencies (2 pts), tampered evidence (2 pts)\n        - Set recommendedAction: APPROVE (risk 1-3), INVESTIGATE (risk 4-7), DENY (risk 8-10)\n        - List specific inconsistencies found (dates, amounts, locations, statements)\n\n        ANALYSIS DEPTH REQUIREMENTS:\n        - observations: 2-3 sentences focusing on evidence validity, missing signatures, and specific fraud indicators with exact file names and dollar amounts\n        - insights: 2-3 sentences covering vendor estimate analysis, timeline logic, and final legitimacy assessment with concrete reasoning\n        - Be specific: reference exact amounts, dates, file names, and percentages\n        - Avoid repetition between observations and insights\n        - COST ANALYSIS: Compare vendor estimates against claimant's estimated repair cost for reasonableness. Flag if vendor quotes are significantly higher/lower than claimant estimates or if there's unusual variance between vendors (>20% difference). Assess if repair costs align with damage severity described.\n        - VENDOR ASSESSMENT: Evaluate if multiple vendor estimates show consistent pricing patterns and scope alignment. Identify any outliers in pricing or scope that may indicate inflated claims or vendor collusion.\n\n        Generate only valid JSON output with no additional text.\n        \"\"\"\n      }\n    ]\n    \n    # TODO implement\n    return {\n        'statusCode': 200,\n        'body': {\n            \"messages\" : messages,\n            \"system\" : system\n        }\n    }\n\ndef cleanse(raw):\n    cleansed = {}\n    for i in raw:\n        print(i.keys())\n        cleansed[\"claimId\"] = i[\"claimId\"]\n        cleansed[i[\"name\"]] = i[\"inference_result\"] if i[\"documentType\"] != \"Others\" else i[\"audio\"]\n        cleansed[i[\"name\"]][\"fraudWarning\"] = i.get(\"fraudDetection\", \"None\")\n    return cleansed\n\ndef read_items_from_dynamodb(table_name, claim_id):\n    # Initialize DynamoDB resource\n    dynamodb = boto3.resource('dynamodb')\n    \n    # Get the table\n    table = dynamodb.Table(table_name)\n    \n    # Perform the query\n    response = table.query(\n        KeyConditionExpression=Key(\"claimId\").eq(claim_id)\n    )\n    \n    # Extract items from the response\n    items = response['Items']\n    \n    return items"
+    },
+    "FunctionName": "insuranceclaimJsonReportGeneration",
+    "Handler": "index.lambda_handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "GenerateJSONReportServiceRole8BCA0B56",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.13",
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "GenerateJSONReportServiceRoleDefaultPolicy2FBAB95B",
+    "GenerateJSONReportServiceRole8BCA0B56"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessLambda/GenerateJSONReport/Resource"
+   }
+  },
+  "PutItemDynamodbServiceRoleD6AC278F": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessLambda/PutItemDynamodb/ServiceRole/Resource"
+   }
+  },
+  "PutItemDynamodbServiceRoleDefaultPolicyCB38DFEB": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:aws:dynamodb:",
+          {
+           "Ref": "AWS::Region"
+          },
+          ":",
+          {
+           "Ref": "AWS::AccountId"
+          },
+          ":table/insuranceclaim*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PutItemDynamodbServiceRoleDefaultPolicyCB38DFEB",
+    "Roles": [
+     {
+      "Ref": "PutItemDynamodbServiceRoleD6AC278F"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessLambda/PutItemDynamodb/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "PutItemDynamodbF7932F71": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "import json\nimport boto3\nfrom decimal import Decimal\n\ndynamodb = boto3.resource('dynamodb')\n\ndef lambda_handler(event, context):\n    table = dynamodb.Table(event[\"dynamodbTable\"])\n    body = event['body']\n    body = json.loads(json.dumps(body), parse_float=Decimal)\n    response = table.put_item(Item = body)\n    return {\n        'statusCode': 200,\n        'body': json.dumps(response)\n    }\n"
+    },
+    "FunctionName": "insuranceclaim-PutItemDynamodb",
+    "Handler": "index.lambda_handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "PutItemDynamodbServiceRoleD6AC278F",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.13",
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "PutItemDynamodbServiceRoleDefaultPolicyCB38DFEB",
+    "PutItemDynamodbServiceRoleD6AC278F"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessLambda/PutItemDynamodb/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zWJywrCMBBFv6X7ZDTWhXvBpZT4AZImI47NA5oJUkL+XWtxdc499wDq1MO+M+8srZukpxHqFTOju7Gxk/ge9+pNGJ2BeinRMqUozo/49ybIBKg6eVzzj0PyZJd1btaa0JhTmS02MSz8THHXg1Kgjt0rE8m5RKaAoDd+APi/lLKWAAAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessLambda/CDKMetadata/Default"
+   },
+   "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Conditions": {
+  "CDKMetadataAvailable": {
+   "Fn::Or": [
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "af-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-3"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-4"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-northwest-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-2"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "il-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "sa-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Equals": [
+      {
+       "Ref": "AWS::Region"
+      },
+      "us-west-2"
+     ]
+    }
+   ]
+  }
+ }
+}

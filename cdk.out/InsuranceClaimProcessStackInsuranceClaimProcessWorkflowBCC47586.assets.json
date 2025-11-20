@@ -1,0 +1,84 @@
+{
+  "version": "40.0.0",
+  "files": {
+    "a7250d57dcfc8e5e92a252221c49f8c62f4ccf0f4a931c8658d3b458f58b2f53": {
+      "source": {
+        "path": "InsuranceClaimProcessStackInsuranceClaimProcessWorkflowInsuranceClaimProcessStepFunctions3FC33873.nested.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-current_region": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "a7250d57dcfc8e5e92a252221c49f8c62f4ccf0f4a931c8658d3b458f58b2f53.json",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    },
+    "b31c8c1ecea6d291e16456783d02f0bb208733dcb52343f4b1ef6c58e5489819": {
+      "source": {
+        "path": "InsuranceClaimProcessStackInsuranceClaimProcessWorkflowInsuranceClaimProcessS3ECD572FE.nested.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-current_region": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "b31c8c1ecea6d291e16456783d02f0bb208733dcb52343f4b1ef6c58e5489819.json",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    },
+    "6c6b6b460c9a6e4ec156a1a9b292edc6ce98a46e1a675ca3155b7bdb1258c44c": {
+      "source": {
+        "path": "InsuranceClaimProcessStackInsuranceClaimProcessWorkflowInsuranceClaimProcessDynamoDBA8DF2E93.nested.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-current_region": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "6c6b6b460c9a6e4ec156a1a9b292edc6ce98a46e1a675ca3155b7bdb1258c44c.json",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    },
+    "76ffeba0cbb6cedf709953aa9d76f4e99c1a6d70911e89bfdd998d8a00169111": {
+      "source": {
+        "path": "InsuranceClaimProcessStackInsuranceClaimProcessWorkflowInsuranceClaimProcessLambda61EBD91A.nested.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-current_region": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "76ffeba0cbb6cedf709953aa9d76f4e99c1a6d70911e89bfdd998d8a00169111.json",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    },
+    "e9f287b9c989ae56c56bedc116810d557c597ccc249e7b1f64922a0ce25c53c8": {
+      "source": {
+        "path": "InsuranceClaimProcessStackInsuranceClaimProcessWorkflowInsuranceClaimProcessSNS4547CE17.nested.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-current_region": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "e9f287b9c989ae56c56bedc116810d557c597ccc249e7b1f64922a0ce25c53c8.json",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    },
+    "115abd162867dca15817039aed68cd42d17bd99c7c687fec5ce8c03a19bc83be": {
+      "source": {
+        "path": "InsuranceClaimProcessStackInsuranceClaimProcessWorkflowBCC47586.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-current_region": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "115abd162867dca15817039aed68cd42d17bd99c7c687fec5ce8c03a19bc83be.json",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

@@ -1,0 +1,60 @@
+{
+  "class": "Vendor Estimates",
+  "description": "This is a blueprint for vendor estimate form.",
+  "type": "object",
+  "definitions": {
+    "VendorEstimate": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "The vendor's name."
+        },
+        "phone": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "The vendor's phone number."
+        },
+        "email": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "The vendor's email."
+        },
+        "address": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "The vendor's address."
+        },
+        "estimateNumber": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "The unique identifier or reference number for estimate. "
+        },
+        "estimateDate": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "The date of this estimate was made. "
+        },
+        "scopeOfWork": {
+          "type": "array",
+          "inferenceType": "explicit",
+          "instruction": "Extract matched work item and price in array. The foramt should be \"work item - price\". For example, [\"Replace to Torn Shingles - 800\", \"Repair Structural Beams - 5000\"]. ",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "properties": {
+    "FirstVendorEstimate": {
+      "$ref": "#/definitions/VendorEstimate",
+      "instruction": "The estimate information from the first vendor. "
+    },
+    "SecondVendorEstimate": {
+      "$ref": "#/definitions/VendorEstimate",
+      "instruction": "The estimate information from the second vendor. "
+    }
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "class": "Premium Paid Document",
+  "description": "This is a blueprint for premium paid document.",
+  "type": "object",
+  "definitions": {
+    "PolicyInfo": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Unique identifier for policy"
+        },
+        "name": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Policy holder name "
+        },
+        "effective_date": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Date when the insurance policy becomes effective"
+        },
+        "expiration_date": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Date when the insurance policy expires"
+        }
+      }
+    },
+    "InsuredInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Insured's name "
+        },
+        "address": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Insured's home address"
+        }
+      }
+    },
+    "AgentInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Agent's name "
+        },
+        "phoneNumber": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Agent's phone number"
+        }
+      }
+    },
+    "PaymentInfo": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Date when payment was made"
+        },
+        "method": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Method that payment for the premium. For example, bank transfer, cash."
+        },
+        "AnnualPremium": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Annual premium paid amount. It should be plain number like 20000, 300000."
+        },
+        "PaymentAmount": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Total payment amount. It should be plain number like 20000, 300000."
+        },
+        "period": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Period that payment was paid. This should be in YYYY-MM-DD to YYYY-MM-DD format. For example, 2024-10-01 to 2025-10-01"
+        }
+      }
+    },
+    "ReceiptInfo": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Unique identifier of receipt"
+        },
+        "issuer": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Insurance company that issued this receipt"
+        },
+        "date": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Receipt issued date"
+        }
+      }
+    }
+  },
+  "properties": {
+    "duration": {
+      "type": "string",
+      "inferenceType": "explicit",
+      "instruction": "Duration of which the premiums is received. Format it as YYYY-MM-DD to YYYY-MM-DD. For example, the output should be 2024-04-01 to 2025-11-30."
+    },
+    "PolicyInfo": {
+      "$ref": "#/definitions/PolicyInfo",
+      "instruction": "Extract information related to policy "
+    },
+    "InsuredInfo": {
+      "$ref": "#/definitions/InsuredInfo",
+      "instruction": "Extract Insured Information"
+    },
+    "AgentInfo": {
+      "$ref": "#/definitions/AgentInfo",
+      "instruction": "Extract agent information"
+    },
+    "PaymentInfo": {
+      "$ref": "#/definitions/PaymentInfo",
+      "instruction": "Extract payment information"
+    },
+    "ReceiptInfo": {
+      "$ref": "#/definitions/ReceiptInfo",
+      "instruction": "Extract receipt information"
+    }
+  }
+}

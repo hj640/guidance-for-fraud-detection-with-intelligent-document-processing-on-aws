@@ -1,0 +1,31 @@
+{
+  "class": "Disaster Damage Assessment",
+  "description": "A blueprint for analyzing the extent of damage to a residential property.",
+  "properties": {
+    "description_of_property": {
+      "type": "string",
+      "inferenceType": "inferred",
+      "instruction": "Provide a brief description of the property, including the type of building, number of stories, and any other relevant details."
+    },
+    "Damage_Location": {
+      "type": "string",
+      "inferenceType": "explicit",
+      "instruction": "The specific area of the house that has been damaged by the fallen tree."
+    },
+    "Damage_Severity": {
+      "type": "string",
+      "inferenceType": "inferred",
+      "instruction": "An assessment of the overall severity of the damage to the property, based on the extent of the structural damage visible in the image. Limit the field values to enum['Minor', 'Moderate', 'Severe']"
+    },
+    "surrounding_environment": {
+      "type": "string",
+      "inferenceType": "inferred",
+      "instruction": "Describe the surrounding environment, including the presence of other buildings, trees, or any other relevant features."
+    },
+    "Potential_Causes": {
+      "type": "string",
+      "inferenceType": "inferred",
+      "instruction": "An assessment of the likely cause of the tree falling, based on the visible damage and surrounding conditions. Limit the field values to enum['Storm', 'High Winds', 'Decay', 'Other']"
+    }
+  }
+}
