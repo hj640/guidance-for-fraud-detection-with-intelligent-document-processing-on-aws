@@ -125,7 +125,7 @@ export default function Review(token) {
               items={claims}
               loadingText="Loading resources"
               selectionType="multi"
-              trackBy="name"
+              trackBy="claimId"
               empty={
                 <Box
                   margin={{ vertical: "xs" }}

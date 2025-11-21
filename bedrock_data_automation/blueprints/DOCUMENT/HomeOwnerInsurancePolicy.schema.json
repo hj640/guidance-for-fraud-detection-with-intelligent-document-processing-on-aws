@@ -1,152 +1,111 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "description": "This is a blueprint for a homeowners insurance policy document",
-    "class": "Homeowners Insurance Policy",
-    "type": "object",
-    "definitions": {
-        "INSURED_ADDRESS": {
-            "type": "object",
-            "properties": {
-                "street": {
-                    "type": "string",
-                    "inferenceType": "explicit",
-                    "instruction": "The street address of the insured property"
-                },
-                "city": {
-                    "type": "string",
-                    "inferenceType": "explicit",
-                    "instruction": "The city where the insured property is located"
-                },
-                "state": {
-                    "type": "string",
-                    "inferenceType": "explicit",
-                    "instruction": "The state where the insured property is located"
-                },
-                "zip_code": {
-                    "type": "string",
-                    "inferenceType": "explicit",
-                    "instruction": "The zip code of the insured property"
-                }
-            }
-        }
-    },
-    "properties": {
-        "policy_number": {
-            "type": "string",
-            "inferenceType": "explicit",
-            "instruction": "The unique identifier for the insurance policy"
+  "class": "Home Owner Insurance Policy",
+  "description": "This is a blueprint for home owner insurance policy.",
+  "type": "object",
+  "definitions": {
+    "PolicyInfo": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Unique identifier for policy"
+        },
+        "name": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Policy holder name"
         },
         "effective_date": {
-            "type": "string",
-            "inferenceType": "explicit",
-            "instruction": "The date when the insurance policy becomes active"
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "The date when the insurance policy becomes active"
         },
         "expiration_date": {
-            "type": "string",
-            "inferenceType": "explicit",
-            "instruction": "The date when the insurance policy expires"
-        },
-        "insured_name": {
-            "type": "string",
-            "inferenceType": "explicit",
-            "instruction": "The name of the person or entity insured under the policy"
-        },
-        "insured_address": {
-            "$ref": "#/definitions/INSURED_ADDRESS",
-            "instruction": "-"
-        },
-        "insurance_company": {
-            "type": "string",
-            "inferenceType": "explicit",
-            "instruction": "The name of the insurance company providing the policy"
-        },
-        "agent_name": {
-            "type": "string",
-            "inferenceType": "explicit",
-            "instruction": "The name of the insurance agent handling the policy"
-        },
-        "agent_contact_information": {
-            "type": "string",
-            "inferenceType": "explicit",
-            "instruction": "The contact information for the insurance agent"
-        },
-        "dwelling_coverage_amount": {
-            "type": "number",
-            "inferenceType": "explicit",
-            "instruction": "The coverage amount for the physical structure of the home"
-        },
-        "dwelling_coverage_description": {
-            "type": "string",
-            "inferenceType": "explicit",
-            "instruction": "The description of what the dwelling coverage protects"
-        },
-        "other_structures_coverage_amount": {
-            "type": "number",
-            "inferenceType": "explicit",
-            "instruction": "The coverage amount for detached structures on the property"
-        },
-        "other_structures_coverage_description": {
-            "type": "string",
-            "inferenceType": "explicit",
-            "instruction": "The description of what the other structures coverage protects"
-        },
-        "personal_property_coverage_amount": {
-            "type": "number",
-            "inferenceType": "explicit",
-            "instruction": "The coverage amount for personal belongings inside and outside the home"
-        },
-        "personal_property_coverage_description": {
-            "type": "string",
-            "inferenceType": "explicit",
-            "instruction": "The description of what the personal property coverage protects"
-        },
-        "loss_of_use_coverage_amount": {
-            "type": "number",
-            "inferenceType": "explicit",
-            "instruction": "The coverage amount for additional living expenses if the home becomes uninhabitable"
-        },
-        "loss_of_use_coverage_description": {
-            "type": "string",
-            "inferenceType": "explicit",
-            "instruction": "The description of what the loss of use coverage provides"
-        },
-        "personal_liability_coverage_amount": {
-            "type": "number",
-            "inferenceType": "explicit",
-            "instruction": "The coverage amount for legal liability for bodily injury or property damage to others"
-        },
-        "personal_liability_coverage_description": {
-            "type": "string",
-            "inferenceType": "explicit",
-            "instruction": "The description of what the personal liability coverage protects"
-        },
-        "medical_payments_coverage_amount": {
-            "type": "number",
-            "inferenceType": "explicit",
-            "instruction": "The coverage amount for medical expenses for someone accidentally injured on the property"
-        },
-        "medical_payments_coverage_description": {
-            "type": "string",
-            "inferenceType": "explicit",
-            "instruction": "The description of what the medical payments coverage provides"
-        },
-        "exclusions": {
-            "type": "array",
-            "inferenceType": "explicit",
-            "instruction": "A list of perils or events that are not covered by the insurance policy",
-            "items": {
-                "type": "string"
-            }
-        },
-        "dwelling_deductible": {
-            "type": "number",
-            "inferenceType": "explicit",
-            "instruction": "The deductible amount for the dwelling coverage"
-        },
-        "other_structures_deductible": {
-            "type": "number",
-            "inferenceType": "explicit",
-            "instruction": "The deductible amount for the other structures coverage"
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "The date when the insurance policy expires"
         }
+      }
+    },
+    "InsuredInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Insured's name"
+        },
+        "address": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Insured's home address"
+        }
+      }
+    },
+    "AgentInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Agent's name"
+        },
+        "phoneNumber": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Agent's phone number"
+        }
+      }
+    },
+    "CoverageInfo": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Extract coverage amount. The amount should be plain number like 10000, 200000"
+        },
+        "description": {
+          "type": "string",
+          "inferenceType": "explicit",
+          "instruction": "Extract coverage description"
+        }
+      }
     }
+  },
+  "properties": {
+    "PolicyInfo": {
+      "$ref": "#/definitions/PolicyInfo",
+      "instruction": "Extract policy information"
+    },
+    "InsuredInfo": {
+      "$ref": "#/definitions/InsuredInfo",
+      "instruction": "Extract insured information"
+    },
+    "AgentInfo": {
+      "$ref": "#/definitions/AgentInfo",
+      "instruction": "Extract agent information"
+    },
+    "Dwelling": {
+      "$ref": "#/definitions/CoverageInfo",
+      "instruction": "Extract dwelling coverage information."
+    },
+    "Other": {
+      "$ref": "#/definitions/CoverageInfo",
+      "instruction": "Extract other structures coverage information"
+    },
+    "PersonalProperty": {
+      "$ref": "#/definitions/CoverageInfo",
+      "instruction": "Extract personal property coverage information"
+    },
+    "UseLoss": {
+      "$ref": "#/definitions/CoverageInfo",
+      "instruction": "Extract loss of use coverage"
+    },
+    "MedicalPayment": {
+      "$ref": "#/definitions/CoverageInfo",
+      "instruction": "Extract medical payments coverage information"
+    }
+  }
 }
