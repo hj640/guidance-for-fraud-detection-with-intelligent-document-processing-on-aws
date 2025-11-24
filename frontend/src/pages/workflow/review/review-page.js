@@ -19,15 +19,12 @@ import {
 import { APP_NAME } from "../../../common/constants";
 import BaseAppLayout from "../../../components/base-app-layout";
 
-// Script to invoke GET https://xxxx.execute-api.us-west-2.amazonaws.com/get-claims
 const getClaims = async (token) => {
-  // add headers to the request including Access-Control-Allow-Origin
   const headers = {
     Authorization: token.token,
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Credentials": "true",
   };
-  // Invoket API using GET method, adding headres
   const response = await fetch(
     API_ENDPOINT + "/get-claims",
     {
@@ -35,18 +32,22 @@ const getClaims = async (token) => {
       headers: headers,
     }
   );
-  //const response = await fetch('https://xxxxx.execute-api.us-west-2.amazonaws.com/get-claims', headers = headers);
   const data = await response.json();
-  return data;
+  if (data.body) {
+    return JSON.parse(data.body);
+  }
+  return Array.isArray(data) ? data : [];
 };
 
 export default function Review(token) {
-  //const onFollow = useOnFollow();
   const [claims, setClaims] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
-      getClaims(token).then((data) => setClaims(data))
+  
   const reload = () => {
-      getClaims(token).then((data) => setClaims(data))
+    getClaims(token).then((data) => setClaims(data)).catch(err => {
+      console.error("Failed to fetch claims:", err);
+      setClaims([]);
+    });
   }
   
   React.useEffect(() => {

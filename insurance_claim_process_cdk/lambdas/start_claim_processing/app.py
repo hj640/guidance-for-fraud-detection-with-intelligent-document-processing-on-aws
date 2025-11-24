@@ -13,7 +13,7 @@ def lambda_handler(event, context):
     bda_project_arn = os.environ['BDA_PROJECT_ARN']
     claim_id = event["queryStringParameters"]['claim_id']
     response = sfn.start_execution(
-        stateMachineArn=f"arn:aws:states:{region}:{account_id}:stateMachine:insuranceclaim-Main_Workflow",
+        stateMachineArn=f"arn:aws:states:{region}:{account_id}:stateMachine:insuranceclaim-ClaimProcessing",
         input=json.dumps({ "claimId": claim_id,
                     "inputBucket": f"insuranceclaim-input-{account_id}-{region}",
                     "outputBucket": f"insuranceclaim-output-{account_id}-{region}",

@@ -1,7 +1,7 @@
 {
   "version": "40.0.0",
   "files": {
-    "a7250d57dcfc8e5e92a252221c49f8c62f4ccf0f4a931c8658d3b458f58b2f53": {
+    "1301cf45e242468e7e56ef7202431a57a42ffeea6e179ba035a64ba6f7866a49": {
       "source": {
         "path": "InsuranceClaimProcessStackInsuranceClaimProcessWorkflowInsuranceClaimProcessStepFunctions3FC33873.nested.template.json",
         "packaging": "file"
@@ -9,7 +9,7 @@
       "destinations": {
         "current_account-current_region": {
           "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
-          "objectKey": "a7250d57dcfc8e5e92a252221c49f8c62f4ccf0f4a931c8658d3b458f58b2f53.json",
+          "objectKey": "1301cf45e242468e7e56ef7202431a57a42ffeea6e179ba035a64ba6f7866a49.json",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
         }
       }
@@ -53,20 +53,7 @@
         }
       }
     },
-    "e9f287b9c989ae56c56bedc116810d557c597ccc249e7b1f64922a0ce25c53c8": {
-      "source": {
-        "path": "InsuranceClaimProcessStackInsuranceClaimProcessWorkflowInsuranceClaimProcessSNS4547CE17.nested.template.json",
-        "packaging": "file"
-      },
-      "destinations": {
-        "current_account-current_region": {
-          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
-          "objectKey": "e9f287b9c989ae56c56bedc116810d557c597ccc249e7b1f64922a0ce25c53c8.json",
-          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
-        }
-      }
-    },
-    "115abd162867dca15817039aed68cd42d17bd99c7c687fec5ce8c03a19bc83be": {
+    "cb60fa90b4ded0e00ff8ef3f6143b259d3d0f686a9c4617374afa170c17e2326": {
       "source": {
         "path": "InsuranceClaimProcessStackInsuranceClaimProcessWorkflowBCC47586.template.json",
         "packaging": "file"
@@ -74,7 +61,7 @@
       "destinations": {
         "current_account-current_region": {
           "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
-          "objectKey": "115abd162867dca15817039aed68cd42d17bd99c7c687fec5ce8c03a19bc83be.json",
+          "objectKey": "cb60fa90b4ded0e00ff8ef3f6143b259d3d0f686a9c4617374afa170c17e2326.json",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
         }
       }

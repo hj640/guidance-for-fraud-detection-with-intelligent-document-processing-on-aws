@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/115abd162867dca15817039aed68cd42d17bd99c7c687fec5ce8c03a19bc83be.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/cb60fa90b4ded0e00ff8ef3f6143b259d3d0f686a9c4617374afa170c17e2326.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -34,112 +34,22 @@
         "InsuranceClaimProcessStackInsuranceClaimProcessWorkflowBCC47586.assets"
       ],
       "metadata": {
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-FraudDetection-sfn-role/Resource": [
+        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-ClaimProcessing-sfn-role/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "insuranceclaimFraudDetectionsfnroleD49E7767"
+            "data": "insuranceclaimClaimProcessingsfnroleC70596EF"
           }
         ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/StepFunctionsLogGroup-insuranceclaim-FraudDetection/Resource": [
+        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/StepFunctionsLogGroup-insuranceclaim-ClaimProcessing/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "StepFunctionsLogGroupinsuranceclaimFraudDetection65EE5A82"
+            "data": "StepFunctionsLogGroupinsuranceclaimClaimProcessing65CE82DD"
           }
         ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-FraudDetection": [
+        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-ClaimProcessing": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "insuranceclaimFraudDetection"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-Ingestion-sfn-role/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "insuranceclaimIngestionsfnrole83D7A1D6"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/StepFunctionsLogGroup-insuranceclaim-Ingestion/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StepFunctionsLogGroupinsuranceclaimIngestionB302ECFC"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-Ingestion": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "insuranceclaimIngestion"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-Main_Workflow-sfn-role/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "insuranceclaimMainWorkflowsfnrole0B6549A9"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/StepFunctionsLogGroup-insuranceclaim-Main_Workflow/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StepFunctionsLogGroupinsuranceclaimMainWorkflow9B0CC751"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-Main_Workflow": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "insuranceclaimMainWorkflow"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-ReportGeneration-sfn-role/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "insuranceclaimReportGenerationsfnrole1049CEA8"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/StepFunctionsLogGroup-insuranceclaim-ReportGeneration/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StepFunctionsLogGroupinsuranceclaimReportGenerationE676E607"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-ReportGeneration": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "insuranceclaimReportGeneration"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-Validation-Transform-sfn-role/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "insuranceclaimValidationTransformsfnrole7FBEB075"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/StepFunctionsLogGroup-insuranceclaim-Validation-Transform/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StepFunctionsLogGroupinsuranceclaimValidationTransformAA3D1E63"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-Validation-Transform": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "insuranceclaimValidationTransform"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-ConnectToBusinessProcess-sfn-role/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "insuranceclaimConnectToBusinessProcesssfnroleCE498A2F"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/StepFunctionsLogGroup-insuranceclaim-ConnectToBusinessProcess/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StepFunctionsLogGroupinsuranceclaimConnectToBusinessProcess78E9902D"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/insuranceclaim-ConnectToBusinessProcess": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "insuranceclaimConnectToBusinessProcess"
+            "data": "insuranceclaimClaimProcessing"
           }
         ],
         "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessStepFunctions/CDKMetadata/Default": [
@@ -352,36 +262,6 @@
             "data": "InsuranceClaimProcessLambdaNestedStackInsuranceClaimProcessLambdaNestedStackResource823A0144"
           }
         ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessSNS/ClaimProcessTopic/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "ClaimProcessTopicCECFBBE4"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessSNS/ClaimProcessTopic/xxxxxxxx@amazon.com/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "ClaimProcessTopicxxxxxxxxamazoncom08BD02BA"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessSNS/CDKMetadata/Default": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CDKMetadata"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessSNS/CDKMetadata/Condition": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CDKMetadataAvailable"
-          }
-        ],
-        "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessSNS.NestedStack/InsuranceClaimProcessSNS.NestedStackResource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "InsuranceClaimProcessSNSNestedStackInsuranceClaimProcessSNSNestedStackResource005481F5"
-          }
-        ],
         "/InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/CDKMetadata/Default": [
           {
             "type": "aws:cdk:logicalId",
@@ -480,7 +360,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1d67883b867fb8b7dc9bb75deb904f82171410df167be8fd8cdc4a61e3d0b906.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/d3aeae51a1f9d154a91d21c92daef157d23565e5b106f698e31e2118f9ce92e9.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -523,7 +403,7 @@
         "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Deployment/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "InsuranceClaimApiDeployment90FC78F2be49024d55536964bf1849a91f2c2f58"
+            "data": "InsuranceClaimApiDeployment90FC78F2a2972ce2bbdbb2d3805b45f6e31d2175"
           }
         ],
         "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/DeploymentStage.dev/Resource": [
@@ -572,6 +452,48 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "InsuranceClaimApigetclaimsGETD1A62DA2"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/claim-status/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApiclaimstatusAAB8B9F2"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/claim-status/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApiclaimstatusOPTIONSADF5DFD5"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/claim-status/{claimId}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApiclaimstatusclaimId90768217"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/claim-status/{claimId}/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApiclaimstatusclaimIdOPTIONSFED47D64"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/claim-status/{claimId}/GET/ApiPermission.InsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449.GET..claim-status.{claimId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApiclaimstatusclaimIdGETApiPermissionInsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449GETclaimstatusclaimId678BBF05"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/claim-status/{claimId}/GET/ApiPermission.Test.InsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449.GET..claim-status.{claimId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApiclaimstatusclaimIdGETApiPermissionTestInsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449GETclaimstatusclaimIdBD77BE40"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/claim-status/{claimId}/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApiclaimstatusclaimIdGET087F89FE"
           }
         ],
         "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-claim-report/Resource": [
@@ -664,6 +586,66 @@
             "data": "InsuranceClaimApistartclaimprocessingGETB19A8110"
           }
         ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-claim-status/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApigetclaimstatus7C9B40BE"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-claim-status/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApigetclaimstatusOPTIONS27C88F9F"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-claim-status/GET/ApiPermission.InsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449.GET..get-claim-status": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApigetclaimstatusGETApiPermissionInsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449GETgetclaimstatus24BDD2D6"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-claim-status/GET/ApiPermission.Test.InsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449.GET..get-claim-status": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApigetclaimstatusGETApiPermissionTestInsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449GETgetclaimstatus7EEC3A56"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/get-claim-status/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApigetclaimstatusGET25EE2A3C"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/view-file/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApiviewfileA4409DE9"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/view-file/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApiviewfileOPTIONSFE8773F3"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/view-file/GET/ApiPermission.InsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449.GET..view-file": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApiviewfileGETApiPermissionInsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449GETviewfileEE7452FA"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/view-file/GET/ApiPermission.Test.InsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449.GET..view-file": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApiviewfileGETApiPermissionTestInsuranceClaimProcessApiStackInsuranceClaimProcessApiInsuranceClaimApi2B2D9449GETviewfileD995E05D"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimApi/Default/view-file/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InsuranceClaimApiviewfileGET1362210E"
+          }
+        ],
         "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/InsuranceClaimProcessAuthorizer/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -740,6 +722,42 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "StartClaimProcessingC3E83B69"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/GetClaimStatus/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetClaimStatusServiceRole891619BC"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/GetClaimStatus/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetClaimStatusServiceRoleDefaultPolicyE9424D5D"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/GetClaimStatus/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetClaimStatusA5D45938"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/GetPresignedUrl/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetPresignedUrlServiceRoleA89FBEE0"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/GetPresignedUrl/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetPresignedUrlServiceRoleDefaultPolicy7219B330"
+          }
+        ],
+        "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/GetPresignedUrl/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetPresignedUrl271F9E2A"
           }
         ],
         "/InsuranceClaimProcessApiStack/InsuranceClaimProcessApi/UserPoolId": [
@@ -852,7 +870,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/43b991e0c94e6f99c7cca6d206e402f7db8c940e6c4151c6589caa97f37484e3.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/60068df59b4dee5579de6900f1ae71d2dc3508ce536ede4bb4072fc1a69cfd41.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [

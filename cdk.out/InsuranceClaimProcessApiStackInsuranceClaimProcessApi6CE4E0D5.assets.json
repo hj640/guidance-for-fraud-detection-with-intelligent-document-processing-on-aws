@@ -1,7 +1,7 @@
 {
   "version": "40.0.0",
   "files": {
-    "1d67883b867fb8b7dc9bb75deb904f82171410df167be8fd8cdc4a61e3d0b906": {
+    "d3aeae51a1f9d154a91d21c92daef157d23565e5b106f698e31e2118f9ce92e9": {
       "source": {
         "path": "InsuranceClaimProcessApiStackInsuranceClaimProcessApi6CE4E0D5.template.json",
         "packaging": "file"
@@ -9,7 +9,7 @@
       "destinations": {
         "current_account-current_region": {
           "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
-          "objectKey": "1d67883b867fb8b7dc9bb75deb904f82171410df167be8fd8cdc4a61e3d0b906.json",
+          "objectKey": "d3aeae51a1f9d154a91d21c92daef157d23565e5b106f698e31e2118f9ce92e9.json",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
         }
       }

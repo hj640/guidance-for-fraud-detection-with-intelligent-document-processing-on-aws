@@ -200,13 +200,11 @@ class ApiStack(Stack):
             aws_iam.PolicyStatement(
                 actions=["states:StartExecution"],
                 resources=[
-                    f"arn:aws:states:{self.region}:{self.account}:stateMachine:insuranceclaim-Main_Workflow",
+                    f"arn:aws:states:{self.region}:{self.account}:stateMachine:insuranceclaim-ClaimProcessing",
                 ],
             )
             #IAM policy to start SFN execution
-
         )
-
 
         # Create API resources and methods
 
@@ -217,6 +215,65 @@ class ApiStack(Stack):
             aws_apigateway.LambdaIntegration(
                 lambda_get_claims,
         #        proxy=True,
+                integration_responses=[
+                    aws_apigateway.IntegrationResponse(
+                        status_code="200",
+                        response_parameters={
+                            "method.response.header.Access-Control-Allow-Origin": "'*'"
+                        }
+                    )
+                ]
+            ),
+            method_responses=[
+                aws_apigateway.MethodResponse(
+                    status_code="200",
+                    response_parameters={
+                        "method.response.header.Access-Control-Allow-Origin": True
+                    }
+                )
+            ],
+            authorizer=authorizer,
+        )
+
+        # GET /claim-status/{claimId}
+        with open(
+            "insurance_claim_process_cdk/lambdas/get_claim_status/app.py", encoding="utf8"
+        ) as fp: 
+            handler_code = fp.read() 
+        lambda_get_claim_status = aws_lambda.Function(
+            self, 
+            "GetClaimStatus",
+            function_name="insuranceclaimApiGetClaimStatus",
+            code=aws_lambda.InlineCode(handler_code),
+            handler="index.lambda_handler",
+            timeout=Duration.seconds(30),
+            runtime=aws_lambda.Runtime.PYTHON_3_13,
+        )
+        lambda_role = lambda_get_claim_status.role 
+        lambda_role.add_to_policy(
+            aws_iam.PolicyStatement(
+                actions=["dynamodb:GetItem"],
+                resources=[
+                    f"arn:aws:dynamodb:{self.region}:{self.account}:table/insuranceclaim-reports-json"
+                ],
+            )
+        )
+        lambda_role.add_to_policy(
+            aws_iam.PolicyStatement(
+                actions=["states:ListExecutions", "states:DescribeExecution"],
+                resources=[
+                    f"arn:aws:states:{self.region}:{self.account}:stateMachine:insuranceclaim-ClaimProcessing",
+                    f"arn:aws:states:{self.region}:{self.account}:execution:insuranceclaim-ClaimProcessing:*"
+                ],
+            )
+        )
+
+        claim_status = api.root.add_resource("claim-status")
+        claim_status_id = claim_status.add_resource("{claimId}")
+        claim_status_id.add_method(
+            "GET",
+            aws_apigateway.LambdaIntegration(
+                lambda_get_claim_status,
                 integration_responses=[
                     aws_apigateway.IntegrationResponse(
                         status_code="200",
@@ -291,7 +348,6 @@ class ApiStack(Stack):
             authorizer=authorizer,
         )
 
-
         # GET /start-claim-processing
         start_claim_processing = api.root.add_resource("start-claim-processing")
         start_claim_processing.add_method(
@@ -318,6 +374,83 @@ class ApiStack(Stack):
             ],
             authorizer=authorizer,
         )
+
+        # GET / get-claim-status 
+        get_claim_status = api.root.add_resource("get-claim-status")
+        get_claim_status.add_method(
+            "GET",
+            aws_apigateway.LambdaIntegration(
+                lambda_get_claim_status,
+                integration_responses=[
+                    aws_apigateway.IntegrationResponse(
+                        status_code="200",
+                        response_parameters={
+                            "method.response.header.Access-Control-Allow-Origin": "'*'"
+                        }
+                    )
+                ]
+            ),
+            method_responses=[
+                aws_apigateway.MethodResponse(
+                    status_code="200",
+                    response_parameters={
+                        "method.response.header.Access-Control-Allow-Origin": True
+                    }
+                )
+            ],
+            authorizer=authorizer,
+        )
+
+        # GET /view-file
+        with open(
+            "insurance_claim_process_cdk/lambdas/get_presigned_url/app.py", encoding="utf8"
+        ) as fp:
+            handler_code = fp.read()
+        lambda_get_presigned_url = aws_lambda.Function(
+            self,
+            "GetPresignedUrl",
+            function_name="insuranceclaimGetPresignedUrl",
+            code=aws_lambda.InlineCode(handler_code),
+            handler="index.lambda_handler",
+            timeout=Duration.seconds(30),
+            runtime=aws_lambda.Runtime.PYTHON_3_13,
+            environment={"INPUT_BUCKET": f"insuranceclaim-input-{self.account}-{self.region}"}
+        )
+        lambda_role = lambda_get_presigned_url.role
+        lambda_role.add_to_policy(
+            aws_iam.PolicyStatement(
+                actions=["s3:GetObject"],
+                resources=[
+                    f"arn:aws:s3:::insuranceclaim-input-{self.account}-{self.region}/*"
+                ],
+            )
+        )
+
+        view_file = api.root.add_resource("view-file")
+        view_file.add_method(
+            "GET",
+            aws_apigateway.LambdaIntegration(
+                lambda_get_presigned_url,
+                integration_responses=[
+                    aws_apigateway.IntegrationResponse(
+                        status_code="200",
+                        response_parameters={
+                            "method.response.header.Access-Control-Allow-Origin": "'*'"
+                        }
+                    )
+                ]
+            ),
+            method_responses=[
+                aws_apigateway.MethodResponse(
+                    status_code="200",
+                    response_parameters={
+                        "method.response.header.Access-Control-Allow-Origin": True
+                    }
+                )
+            ],
+            authorizer=authorizer,
+        )
+
         # Output the API URL
         CfnOutput(self, "UserPoolId", value=user_pool.user_pool_id , description="Cognito User Pool ID")
         CfnOutput(self, "UserPoolClientId", value=user_pool_client.user_pool_client_id , description="Cognito User Pool Client ID")

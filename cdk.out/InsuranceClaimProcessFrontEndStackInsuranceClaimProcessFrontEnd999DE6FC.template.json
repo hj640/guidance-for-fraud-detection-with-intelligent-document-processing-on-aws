@@ -578,7 +578,7 @@
      }
     ],
     "SourceObjectKeys": [
-     "9d75573d67f2ef98654ea48c4eb4b401e52dbd582f557f79e623800c7f98f5b1.zip"
+     "1013d588d2a215f590ce6cab63a4708d9086676ca46a24e275554774c8edb028.zip"
     ],
     "DestinationBucketName": {
      "Ref": "insuranceclaimfrontendbucketB1E8287E"

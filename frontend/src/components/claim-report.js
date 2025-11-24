@@ -33,6 +33,7 @@ function BulletList({ items }) {
 
 export default function ClaimReport(props) {
   const claimData = props.claimData;
+  const token = props.token;
   useEffect(() => {
     const handleResizeObserverError = (e) => {
       if (e.message === 'ResizeObserver loop completed with undelivered notifications.') {
@@ -303,11 +304,11 @@ claimData.claimInfo.claimDate
                             onFollow={async (e) => {
                               e.preventDefault();
                               try {
-                                const token = localStorage.getItem('idToken');
-                                const response = await fetch(`${API_ENDPOINT}view-file?claimId=${claimData.claimId}&fileName=${item.fileName}`, {
-                                  headers: { 'Authorization': `Bearer ${token}` }
+                                const response = await fetch(`${API_ENDPOINT}/view-file?claimId=${claimData.claimId}&fileName=${item.fileName}`, {
+                                  headers: { 'Authorization': token.token }
                                 });
-                                const data = await response.json();
+                                const result = await response.json();
+                                const data = result.body ? JSON.parse(result.body) : result;
                                 if (data.url) window.open(data.url, '_blank');
                               } catch (error) {
                                 console.error('Error fetching file URL:', error);

@@ -1,0 +1,374 @@
+{
+    "Comment": "Insurance claim processing workflow",
+    "QueryLanguage": "JSONata",
+    "StartAt": "Wait for Upload Completion",
+    "States": {
+        "Wait for Upload Completion": {
+            "Type": "Wait",
+            "Seconds": 5,
+            "Next": "List Claim Documents"
+        },
+        "List Claim Documents": {
+            "Type": "Task",
+            "TimeoutSeconds": 60,
+            "Resource": "arn:aws:states:::aws-sdk:s3:listObjectsV2",
+            "Arguments": {
+                "Bucket": "{% $states.input.inputBucket %}",
+                "Prefix": "{% $states.input.claimId %}"
+            },
+            "Output": {
+                "listObjects": "{% $states.result.Contents %}",
+                "inputBucket": "{% $states.input.inputBucket %}",
+                "outputBucket": "{% $states.input.outputBucket %}",
+                "bdaProjectArn": "{% $states.input.bdaProjectArn %}",
+                "claimId": "{% $states.input.claimId %}"
+            },
+            "Next": "Process Each Document",
+            "Catch": [
+                {
+                    "ErrorEquals": ["States.ALL"],
+                    "Next": "Processing Failed"
+                }
+            ]
+        },
+        "Process Each Document": {
+            "Type": "Map",
+            "MaxConcurrency": 10,
+            "Items": "{% $states.input.listObjects %}",
+            "ItemSelector": {
+                "inputBucket": "{% $states.input.inputBucket %}",
+                "outputBucket": "{% $states.input.outputBucket %}",
+                "size": "{% $states.context.Map.Item.Value.Size %}",
+                "key": "{% $states.context.Map.Item.Value.Key %}",
+                "bdaProjectArn": "{% $states.input.bdaProjectArn %}",
+                "claimId": "{% $states.input.claimId %}"
+            },
+            "Output": {
+                "inputBucket": "{% $states.input.inputBucket %}",
+                "outputBucket": "{% $states.input.outputBucket %}",
+                "bdaProjectArn": "{% $states.input.bdaProjectArn %}",
+                "claimId": "{% $states.input.claimId %}"
+            },
+            "ItemProcessor": {
+                "ProcessorConfig": {
+                    "Mode": "DISTRIBUTED",
+                    "ExecutionType": "STANDARD"
+                },
+                "StartAt": "Is Folder",
+                "States": {
+                    "Is Folder": {
+                        "Type": "Choice",
+                        "Choices": [
+                            {
+                                "Condition": "{% $states.input.size = 0 %}",
+                                "Next": "Skip Document"
+                            }
+                        ],
+                        "Default": "Invoke BDA"
+                    },
+                    "Invoke BDA": {
+                        "Type": "Task",
+                        "TimeoutSeconds": 300,
+                        "Resource": "arn:aws:states:::aws-sdk:bedrockdataautomationruntime:invokeDataAutomationAsync",
+                        "Arguments": {
+                            "DataAutomationProfileArn": "arn:aws:bedrock:<AWS_REGION>:<AWS_ACCOUNT>:data-automation-profile/us.data-automation-v1",
+                            "DataAutomationConfiguration": {
+                                "Stage": "LIVE",
+                                "DataAutomationProjectArn": "{% $states.input.bdaProjectArn %}"
+                            },
+                            "NotificationConfiguration": {
+                                "EventBridgeConfiguration": {
+                                    "EventBridgeEnabled": true
+                                }
+                            },
+                            "InputConfiguration": {
+                                "S3Uri": "{% 's3://' & $states.input.inputBucket & '/' & $states.input.key %}"
+                            },
+                            "OutputConfiguration": {
+                                "S3Uri": "{% 's3://' & $states.input.outputBucket & '/' & $states.input.key %}"
+                            }
+                        },
+                        "Output": {
+                            "inputBucket": "{% $states.input.inputBucket %}",
+                            "claimId": "{% $states.input.claimId %}",
+                            "key": "{% $states.input.key %}",
+                            "outputBucket": "{% $states.input.outputBucket %}",
+                            "InvocationArn": "{% $states.result.InvocationArn %}"
+                        },
+                        "Next": "Wait for BDA",
+                        "Catch": [
+                            {
+                                "ErrorEquals": ["States.ALL"],
+                                "Next": "BDA Failed"
+                            }
+                        ]
+                    },
+                    "Wait for BDA": {
+                        "Type": "Wait",
+                        "Seconds": 10,
+                        "Next": "Check BDA Status"
+                    },
+                    "Check BDA Status": {
+                        "Type": "Task",
+                        "TimeoutSeconds": 60,
+                        "Resource": "arn:aws:states:::aws-sdk:bedrockdataautomationruntime:getDataAutomationStatus",
+                        "Arguments": {
+                            "InvocationArn": "{% $states.input.InvocationArn %}"
+                        },
+                        "Output": {
+                            "inputBucket": "{% $states.input.inputBucket %}",
+                            "claimId": "{% $states.input.claimId %}",
+                            "key": "{% $states.input.key %}",
+                            "outputBucket": "{% $states.input.outputBucket %}",
+                            "Status": "{% $states.result.Status %}",
+                            "InvocationArn": "{% $states.input.InvocationArn %}"
+                        },
+                        "Next": "BDA Complete"
+                    },
+                    "BDA Complete": {
+                        "Type": "Choice",
+                        "Choices": [
+                            {
+                                "Condition": "{% $states.input.Status = 'Success' %}",
+                                "Next": "Store Raw JSON"
+                            },
+                            {
+                                "Condition": "{% $states.input.Status = 'Failed' %}",
+                                "Next": "BDA Failed"
+                            }
+                        ],
+                        "Default": "Wait for BDA"
+                    },
+                    "Store Raw JSON": {
+                        "Type": "Task",
+                        "TimeoutSeconds": 300,
+                        "Resource": "arn:aws:states:::lambda:invoke",
+                        "Arguments": {
+                            "FunctionName": "arn:aws:lambda:<AWS_REGION>:<AWS_ACCOUNT>:function:insuranceclaimRawJsonProcessing",
+                            "Payload": {
+                                "inputBucket": "{% $states.input.inputBucket %}",
+                                "claimId": "{% $states.input.claimId %}",
+                                "key": "{% $states.input.key %}",
+                                "outputBucket": "{% $states.input.outputBucket %}"
+                            }
+                        },
+                        "Output": "{% $merge([$states.input, $states.result.Payload]) %}",
+                        "Next": "Is Image",
+                        "Retry": [
+                            {
+                                "ErrorEquals": [
+                                    "Lambda.ServiceException",
+                                    "Lambda.AWSLambdaException",
+                                    "Lambda.SdkClientException",
+                                    "Lambda.TooManyRequestsException"
+                                ],
+                                "IntervalSeconds": 1,
+                                "MaxAttempts": 3,
+                                "BackoffRate": 2,
+                                "JitterStrategy": "FULL"
+                            }
+                        ],
+                        "Catch": [
+                            {
+                                "ErrorEquals": ["States.ALL"],
+                                "Next": "Document Processing Complete"
+                            }
+                        ]
+                    },
+                    "Is Image": {
+                        "Type": "Choice",
+                        "Choices": [
+                            {
+                                "Condition": "{% $states.input.documentType = 'Disaster Damage Assessment' %}",
+                                "Next": "Detect Image Tampering"
+                            }
+                        ],
+                        "Default": "Document Processing Complete"
+                    },
+                    "Detect Image Tampering": {
+                        "Type": "Task",
+                        "TimeoutSeconds": 300,
+                        "Resource": "arn:aws:states:::lambda:invoke",
+                        "Arguments": {
+                            "FunctionName": "arn:aws:lambda:<AWS_REGION>:<AWS_ACCOUNT>:function:insuranceclaimImageTamperingDetection",
+                            "Payload": {
+                                "inputBucket": "{% $states.input.inputBucket %}",
+                                "claimId": "{% $states.input.claimId %}",
+                                "key": "{% $states.input.key %}",
+                                "outputBucket": "{% $states.input.outputBucket %}"
+                            }
+                        },
+                        "Output": "{% $merge([$states.result.Payload, $states.input]) %}",
+                        "Next": "Is Tampered",
+                        "Retry": [
+                            {
+                                "ErrorEquals": [
+                                    "Lambda.ServiceException",
+                                    "Lambda.AWSLambdaException",
+                                    "Lambda.SdkClientException",
+                                    "Lambda.TooManyRequestsException"
+                                ],
+                                "IntervalSeconds": 1,
+                                "MaxAttempts": 3,
+                                "BackoffRate": 2,
+                                "JitterStrategy": "FULL"
+                            }
+                        ],
+                        "Catch": [
+                            {
+                                "ErrorEquals": ["States.ALL"],
+                                "Next": "Document Processing Complete"
+                            }
+                        ]
+                    },
+                    "Is Tampered": {
+                        "Type": "Choice",
+                        "Choices": [
+                            {
+                                "Condition": "{% $states.input.fraudDetect = 1 %}",
+                                "Next": "Mark as Tampered"
+                            }
+                        ],
+                        "Default": "Document Processing Complete"
+                    },
+                    "Mark as Tampered": {
+                        "Type": "Task",
+                        "TimeoutSeconds": 60,
+                        "Resource": "arn:aws:states:::dynamodb:updateItem",
+                        "Arguments": {
+                            "TableName": "insuranceclaim-bda-results-raw",
+                            "Key": {
+                                "claimId": {
+                                    "S": "{% $states.input.claimId %}"
+                                },
+                                "name": {
+                                    "S": "{% $split($states.input.key, '/')[-1] %}"
+                                }
+                            },
+                            "UpdateExpression": "SET fraudDetection = :fraudDetection",
+                            "ExpressionAttributeValues": {
+                                ":fraudDetection": {
+                                    "S": "Tampered Image"
+                                }
+                            }
+                        },
+                        "Next": "Document Processing Complete"
+                    },
+                    "Document Processing Complete": {
+                        "Type": "Succeed"
+                    },
+                    "BDA Failed": {
+                        "Type": "Fail",
+                        "Error": "BDAProcessingError",
+                        "Cause": "Bedrock Data Automation failed to process document"
+                    },
+                    "Skip Document": {
+                        "Type": "Succeed"
+                    }
+                }
+            },
+            "Next": "Prepare Report Prompt",
+            "Catch": [
+                {
+                    "ErrorEquals": ["States.ALL"],
+                    "Next": "Processing Failed"
+                }
+            ]
+        },
+        "Prepare Report Prompt": {
+            "Type": "Task",
+            "TimeoutSeconds": 300,
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Arguments": {
+                "FunctionName": "arn:aws:lambda:<AWS_REGION>:<AWS_ACCOUNT>:function:insuranceclaimJsonReportGeneration",
+                "Payload": "{% $states.input %}"
+            },
+            "Output": "{% $merge([$states.input, {'prompt': $states.result.Payload}]) %}",
+            "Next": "Generate JSON Report",
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2,
+                    "JitterStrategy": "FULL"
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": ["States.ALL"],
+                    "Next": "Processing Complete"
+                }
+            ]
+        },
+        "Generate JSON Report": {
+            "Type": "Task",
+            "TimeoutSeconds": 600,
+            "Resource": "arn:aws:states:::aws-sdk:bedrockruntime:converse",
+            "Arguments": {
+                "ModelId": "us.amazon.nova-pro-v1:0",
+                "InferenceConfig": {
+                    "MaxTokens": 4096,
+                    "Temperature": 0.2,
+                    "TopP": 0.2
+                },
+                "System": "{% $states.input.prompt.body.system %}",
+                "Messages": "{% $states.input.prompt.body.messages %}"
+            },
+            "Output": "{% $merge([$states.result, {'claimId': $states.input.claimId}]) %}",
+            "Next": "Store JSON Report",
+            "Catch": [
+                {
+                    "ErrorEquals": ["States.ALL"],
+                    "Next": "Processing Complete"
+                }
+            ]
+        },
+        "Store JSON Report": {
+            "Type": "Task",
+            "TimeoutSeconds": 300,
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Arguments": {
+                "FunctionName": "arn:aws:lambda:<AWS_REGION>:<AWS_ACCOUNT>:function:insuranceclaim-PutItemDynamodb",
+                "Payload": {
+                    "dynamodbTable": "insuranceclaim-reports-json",
+                    "body": "{% $parse($replace($replace($states.input.Output.Message.Content[0].Text,'```json\\n', ''), '```','')) %}"
+                }
+            },
+            "Next": "Processing Complete",
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2,
+                    "JitterStrategy": "FULL"
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": ["States.ALL"],
+                    "Next": "Processing Complete"
+                }
+            ]
+        },
+        "Processing Complete": {
+            "Type": "Succeed"
+        },
+        "Processing Failed": {
+            "Type": "Fail",
+            "Error": "ClaimProcessingError",
+            "Cause": "Failed to process insurance claim"
+        }
+    }
+}

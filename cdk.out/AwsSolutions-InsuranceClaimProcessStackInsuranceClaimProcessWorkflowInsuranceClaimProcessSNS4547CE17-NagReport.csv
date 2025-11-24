@@ -1,2 +1,0 @@
-Rule ID,Resource ID,Compliance,Exception Reason,Rule Level,Rule Info
-"AwsSolutions-SNS3","InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessSNS/ClaimProcessTopic/Resource","Suppressed","SNS topic is acceptable for non-production code.","Error","The SNS Topic does not require publishers to use SSL."

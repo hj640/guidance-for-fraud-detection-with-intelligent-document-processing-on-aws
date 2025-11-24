@@ -8,7 +8,6 @@ from constructs import Construct
 from insurance_claim_process_cdk.dynamodb import DynamoDBStack
 from insurance_claim_process_cdk.lambdafn import LambdaStack
 from insurance_claim_process_cdk.s3 import S3Stack
-from insurance_claim_process_cdk.sns import NotificationStack
 from insurance_claim_process_cdk.statemachines import BaseSfnStateMachineStack
 import configparser
 config = configparser.ConfigParser()
@@ -22,4 +21,3 @@ class WorkflowStack(Stack):
         s3 = S3Stack(self, "InsuranceClaimProcessS3")
         dynamodb = DynamoDBStack(self, "InsuranceClaimProcessDynamoDB")
         lambda_ = LambdaStack(self, "InsuranceClaimProcessLambda")
-        sns = NotificationStack(self, "InsuranceClaimProcessSNS")

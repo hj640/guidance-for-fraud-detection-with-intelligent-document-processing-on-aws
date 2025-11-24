@@ -84,7 +84,7 @@ export default function ReviewDetail(token) {
       content={
         <ContentLayout header={<Header variant="h1">Claim Report</Header>}>
           <SpaceBetween size="l">
-            <ClaimReport claimData = {claimReport}/>
+            <ClaimReport claimData={claimReport} token={token}/>
           </SpaceBetween>
         </ContentLayout>
       }

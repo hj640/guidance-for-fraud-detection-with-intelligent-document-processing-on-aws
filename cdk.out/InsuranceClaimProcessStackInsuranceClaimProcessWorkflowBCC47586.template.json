@@ -109,7 +109,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/a7250d57dcfc8e5e92a252221c49f8c62f4ccf0f4a931c8658d3b458f58b2f53.json"
+       "/1301cf45e242468e7e56ef7202431a57a42ffeea6e179ba035a64ba6f7866a49.json"
       ]
      ]
     }
@@ -215,38 +215,6 @@
    "Metadata": {
     "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessLambda.NestedStack/InsuranceClaimProcessLambda.NestedStackResource",
     "aws:asset:path": "InsuranceClaimProcessStackInsuranceClaimProcessWorkflowInsuranceClaimProcessLambda61EBD91A.nested.template.json",
-    "aws:asset:property": "TemplateURL"
-   }
-  },
-  "InsuranceClaimProcessSNSNestedStackInsuranceClaimProcessSNSNestedStackResource005481F5": {
-   "Type": "AWS::CloudFormation::Stack",
-   "Properties": {
-    "TemplateURL": {
-     "Fn::Join": [
-      "",
-      [
-       "https://s3.",
-       {
-        "Ref": "AWS::Region"
-       },
-       ".",
-       {
-        "Ref": "AWS::URLSuffix"
-       },
-       "/",
-       {
-        "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
-       },
-       "/e9f287b9c989ae56c56bedc116810d557c597ccc249e7b1f64922a0ce25c53c8.json"
-      ]
-     ]
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "InsuranceClaimProcessStack/InsuranceClaimProcessWorkflow/InsuranceClaimProcessSNS.NestedStack/InsuranceClaimProcessSNS.NestedStackResource",
-    "aws:asset:path": "InsuranceClaimProcessStackInsuranceClaimProcessWorkflowInsuranceClaimProcessSNS4547CE17.nested.template.json",
     "aws:asset:property": "TemplateURL"
    }
   },

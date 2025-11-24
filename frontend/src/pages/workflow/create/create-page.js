@@ -11,7 +11,6 @@ import {
   Header,
   SpaceBetween,
 } from "@cloudscape-design/components";
-//import { useOnFollow } from "../common/hooks/use-on-follow";
 import { API_ENDPOINT, APP_NAME } from "../../../common/constants";
 import BaseAppLayout from "../../../components/base-app-layout";
 import uploadFiles from "../../../components/upload-files";
@@ -43,27 +42,69 @@ export default function Create(token) {
   const [claimId, setClaimId] = React.useState("");
   const [submitted, setSubmitted] = React.useState(false);
   const [succesfulSubmission, setSuccesfulSubmission] = React.useState(false);
+  const [processingStatus, setProcessingStatus] = React.useState("IDLE");
+
+  // Poll for claim status
+  React.useEffect(() => {
+    if (processingStatus === "PROCESSING" && claimId) {
+      const interval = setInterval(async () => {
+        try {
+          const response = await fetch(
+            API_ENDPOINT + "/claim-status/" + claimId,
+            {
+              method: "GET",
+              headers: {
+                Authorization: token.token,
+              },
+            }
+          );
+          const data = await response.json();
+          
+          if (data.status === "COMPLETED") {
+            setProcessingStatus("COMPLETED");
+            clearInterval(interval);
+          } else if (data.status === "FAILED") {
+            setProcessingStatus("FAILED");
+            clearInterval(interval);
+          }
+        } catch (error) {
+          console.error("Status check failed:", error);
+        }
+      }, 5000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [processingStatus, claimId, token.token]);
 
   return (
     <BaseAppLayout
       notifications={
-        succesfulSubmission && (
-          <Flashbar
-            items={[
-              {
-                type: "success",
-                dismissible: true,
-                content:
-                  "Claim ID " + claimId + " has been submitted for processing.",
-                id: "success",
-              },
-            ]}
-          />
-        )
+        <Flashbar
+          items={[
+            succesfulSubmission && processingStatus === "PROCESSING" && {
+              type: "info",
+              loading: true,
+              content: "Processing claim " + claimId + "... This may take 2-5 minutes.",
+              id: "processing",
+            },
+            processingStatus === "COMPLETED" && {
+              type: "success",
+              dismissible: true,
+              content: "Claim " + claimId + " processing completed!",
+              action: <Button href={"/workflow/review?claim_id=" + claimId}>View Report</Button>,
+              id: "completed",
+            },
+            processingStatus === "FAILED" && {
+              type: "error",
+              dismissible: true,
+              content: "Claim " + claimId + " processing failed. Please try again.",
+              id: "failed",
+            },
+          ].filter(Boolean)}
+        />
       }
       breadcrumbs={
         <BreadcrumbGroup
-          //onFollow={onFollow}
           items={[
             {
               text: APP_NAME,
@@ -88,11 +129,13 @@ export default function Create(token) {
                 <Button
                   formAction="none"
                   variant="link"
+                  disabled={processingStatus === "UPLOADING" || processingStatus === "PROCESSING"}
                   onClick={() => {
                     setSubmitted(false);
                     setClaimId("");
                     setFiles([]);
                     setSuccesfulSubmission(false);
+                    setProcessingStatus("IDLE");
                   }}
                 >
                   Cancel
@@ -100,17 +143,18 @@ export default function Create(token) {
                 <Button
                   formAction="Submit"
                   variant="primary"
+                  disabled={processingStatus === "UPLOADING" || processingStatus === "PROCESSING"}
                   onClick={() => {
                     setSubmitted(true);
                     if (validateClaimId(claimId) || validateFiles(files)) {
                       return;
                     }
+                    
+                    setProcessingStatus("UPLOADING");
                     uploadFiles(files, claimId, token);
-                    // Invoke API to start SFN to process documents
-                    var response = fetch(
-                      API_ENDPOINT +
-                        "/start-claim-processing?claim_id=" +
-                        claimId,
+                    
+                    fetch(
+                      API_ENDPOINT + "/start-claim-processing?claim_id=" + claimId,
                       {
                         method: "GET",
                         headers: {
@@ -123,11 +167,17 @@ export default function Create(token) {
                       .then((response) => response.json())
                       .then((data) => {
                         setSuccesfulSubmission(true);
+                        setProcessingStatus("PROCESSING");
+                      })
+                      .catch((error) => {
+                        console.error("Failed to start processing:", error);
+                        setProcessingStatus("FAILED");
                       });
-                    console.log(response);
                   }}
                 >
-                  Submit
+                  {processingStatus === "UPLOADING" ? "Uploading..." : 
+                   processingStatus === "PROCESSING" ? "Processing..." : 
+                   "Submit"}
                 </Button>
               </SpaceBetween>
             }
@@ -144,6 +194,7 @@ export default function Create(token) {
               >
                 <Input
                   value={claimId}
+                  disabled={processingStatus === "UPLOADING" || processingStatus === "PROCESSING"}
                   onChange={(event) => setClaimId(event.detail.value)}
                 />
               </FormField>
@@ -156,6 +207,7 @@ export default function Create(token) {
                 <FileUpload
                   onChange={({ detail }) => setFiles(detail.value)}
                   value={files}
+                  disabled={processingStatus === "UPLOADING" || processingStatus === "PROCESSING"}
                   i18nStrings={{
                     uploadButtonText: (e) =>
                       e ? "Choose files" : "Choose file",
