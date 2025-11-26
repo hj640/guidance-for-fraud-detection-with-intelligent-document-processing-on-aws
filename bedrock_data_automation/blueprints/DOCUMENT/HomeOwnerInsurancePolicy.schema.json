@@ -9,7 +9,7 @@
         "number": {
           "type": "string",
           "inferenceType": "explicit",
-          "instruction": "Unique identifier for policy"
+          "instruction": "Extract the policy number - unique alphanumeric identifier typically found near the top of the document"
         },
         "name": {
           "type": "string",
@@ -19,12 +19,12 @@
         "effective_date": {
           "type": "string",
           "inferenceType": "explicit",
-          "instruction": "The date when the insurance policy becomes active"
+          "instruction": "Policy start date following 'Effective Date:' at document top"
         },
         "expiration_date": {
           "type": "string",
           "inferenceType": "explicit",
-          "instruction": "The date when the insurance policy expires"
+          "instruction": "Date when policy coverage ends, found after 'Expiration Date:' label"
         }
       }
     },
@@ -62,14 +62,14 @@
       "type": "object",
       "properties": {
         "amount": {
-          "type": "string",
+          "type": "number",
           "inferenceType": "explicit",
-          "instruction": "Extract coverage amount. The amount should be plain number like 10000, 200000"
+          "instruction": "Extract coverage amount as numeric value only, without currency symbols or commas (e.g., 250000 for $250,000)"
         },
         "description": {
           "type": "string",
           "inferenceType": "explicit",
-          "instruction": "Extract coverage description"
+          "instruction": "Text from Description row explaining what this coverage protects"
         }
       }
     }
@@ -102,10 +102,6 @@
     "UseLoss": {
       "$ref": "#/definitions/CoverageInfo",
       "instruction": "Extract loss of use coverage"
-    },
-    "MedicalPayment": {
-      "$ref": "#/definitions/CoverageInfo",
-      "instruction": "Extract medical payments coverage information"
     }
   }
 }
